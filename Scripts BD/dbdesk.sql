@@ -1,6 +1,6 @@
 ﻿/*==============================================================*/
 /* DBMS name:      InterBase 6.x And Firebird 3.0               */
-/* Created on:     22/11/2020 11:03:55                          */
+/* Created on:     23/11/2020 09:10:24                          */
 /*==============================================================*/
 
 
@@ -321,6 +321,26 @@ DROP SEQUENCE GEN_ID_ASTUSUAR;
 DROP SEQUENCE GEN_ID_CFTPESSO;
 
 DROP SEQUENCE GET_ID_AETPRODU;
+
+CREATE OR ALTER EXCEPTION ERRDEL_CHILD_PARENT 'O registro foi usando em outra tabela, com isso não pode ser deletado. Deleção proibida!';
+
+COMMENT ON EXCEPTION ERRDEL_CHILD_PARENT IS 'Comentários';
+
+CREATE OR ALTER EXCEPTION ERRINS_PARENT_NOT_EXIST 'Essa registro depende da existencia de outro registro em outra tabela, e neste momento não existe';
+
+CREATE OR ALTER EXCEPTION ERRORS_GROUP_DISABLE 'O grupo da conta está inativo. Por isso não pode prosseguir. Se deseja realmente prosseguir ative o grupo da conta ou troque o grupo da conta para um grupo que esteja ativo.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_DISABLE 'O usuário e/ou a conta está inativa. Por isso não pode prosseguir.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_EXIST 'O usuário e nem o identificador da conta não está cadastrado, ou seja, a conta de login não existe.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_PARAM 'Não foi passado o nome do usuário e nem o identificador da conta no momento de fazer a transação(inserir, atualizar ou deletar)';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CHILD 'Nessa tabela não pode alterar o registro filho, ou seja, não pode alter o ID de um campo que depende de outra tabela(filho).';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CLOMUN 'Por padrão definido o campo não pode ser modificado.';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CHILD_PARENT 'O registro foi usando em outra tabela, então um ou mias campo não poder ser alterado. Altaração proibida!';
 
 CREATE SEQUENCE GEN_CFTPESSO_COD_CLI;
 SET GENERATOR GEN_CFTPESSO_COD_CLI TO 0;
