@@ -1,6 +1,6 @@
-﻿/*==============================================================*/
+/*==============================================================*/
 /* DBMS name:      InterBase 6.x And Firebird 3.0               */
-/* Created on:     23/11/2020 09:10:24                          */
+/* Created on:     28/11/2020 04:24:55                          */
 /*==============================================================*/
 
 
@@ -128,7 +128,7 @@ DROP PROCEDURE PROC_CHECA_CONTA;
 
 DROP PROCEDURE PROC_LOG_INSERT;
 
-DROP INDEX INDEX_AETGRUPO_ID_AETGRUPO;
+DROP INDEX INDEX_AETGRUPO_DESCRICAO;
 
 DROP TABLE AETGRUPO;
 
@@ -184,17 +184,15 @@ DROP INDEX INDEX_ASTGRCON_DESCRICAO;
 
 DROP TABLE ASTGRCON;
 
-DROP INDEX INDEX_ASTLOGTA_ARCHIVE_DESC;
+DROP INDEX INDEX_ASTLOGER_ARQUIVO_DESC;
 
-DROP INDEX INDEX_ASTLOGTA_ARCHIVE_ASC;
+DROP INDEX INDEX_ASTLOGER_ARQUIVO_ASC;
 
 DROP TABLE ASTLOGER;
 
 DROP INDEX INDEX_ASTREGDE_UUID;
 
 DROP INDEX INDEX_ASTREGDE_UUID_DELETE;
-
-DROP INDEX INDEX_ID_ASTREGDE;
 
 DROP TABLE ASTREGDE;
 
@@ -223,6 +221,8 @@ DROP INDEX INDEX_CFTPESSO_NOME_RAZAO_DESC;
 DROP INDEX INDEX_CFTPESSO_NOME_RAZAO_ASC;
 
 DROP TABLE CFTPESSO;
+
+DROP ROLE SOMENTE_SELECT;
 
 DROP DOMAIN DMADMIN;
 
@@ -312,7 +312,7 @@ DROP SEQUENCE GEN_ID_ASTFILIA;
 
 DROP SEQUENCE GEN_ID_ASTGRCON;
 
-DROP SEQUENCE GEN_ID_ASTLOGTA;
+DROP SEQUENCE GEN_ID_ASTLOGER;
 
 DROP SEQUENCE GEN_ID_ASTREGDE;
 
@@ -321,26 +321,6 @@ DROP SEQUENCE GEN_ID_ASTUSUAR;
 DROP SEQUENCE GEN_ID_CFTPESSO;
 
 DROP SEQUENCE GET_ID_AETPRODU;
-
-CREATE OR ALTER EXCEPTION ERRDEL_CHILD_PARENT 'O registro foi usando em outra tabela, com isso não pode ser deletado. Deleção proibida!';
-
-COMMENT ON EXCEPTION ERRDEL_CHILD_PARENT IS 'Comentários';
-
-CREATE OR ALTER EXCEPTION ERRINS_PARENT_NOT_EXIST 'Essa registro depende da existencia de outro registro em outra tabela, e neste momento não existe';
-
-CREATE OR ALTER EXCEPTION ERRORS_GROUP_DISABLE 'O grupo da conta está inativo. Por isso não pode prosseguir. Se deseja realmente prosseguir ative o grupo da conta ou troque o grupo da conta para um grupo que esteja ativo.';
-
-CREATE OR ALTER EXCEPTION ERRORS_USER_DISABLE 'O usuário e/ou a conta está inativa. Por isso não pode prosseguir.';
-
-CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_EXIST 'O usuário e nem o identificador da conta não está cadastrado, ou seja, a conta de login não existe.';
-
-CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_PARAM 'Não foi passado o nome do usuário e nem o identificador da conta no momento de fazer a transação(inserir, atualizar ou deletar)';
-
-CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CHILD 'Nessa tabela não pode alterar o registro filho, ou seja, não pode alter o ID de um campo que depende de outra tabela(filho).';
-
-CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CLOMUN 'Por padrão definido o campo não pode ser modificado.';
-
-CREATE OR ALTER EXCEPTION ERRUPD_CHILD_PARENT 'O registro foi usando em outra tabela, então um ou mias campo não poder ser alterado. Altaração proibida!';
 
 CREATE SEQUENCE GEN_CFTPESSO_COD_CLI;
 SET GENERATOR GEN_CFTPESSO_COD_CLI TO 0;
@@ -381,8 +361,8 @@ SET GENERATOR GEN_ID_ASTFILIA TO 0;
 CREATE SEQUENCE GEN_ID_ASTGRCON;
 SET GENERATOR GEN_ID_ASTGRCON TO 0;
 
-CREATE SEQUENCE GEN_ID_ASTLOGTA;
-SET GENERATOR GEN_ID_ASTLOGTA TO 0;
+CREATE SEQUENCE GEN_ID_ASTLOGER;
+SET GENERATOR GEN_ID_ASTLOGER TO 0;
 
 CREATE SEQUENCE GEN_ID_ASTREGDE;
 SET GENERATOR GEN_ID_ASTREGDE TO 0;
@@ -492,6 +472,8 @@ CREATE DOMAIN DMINTEGRATION AS INTEGER;
 /*==============================================================*/
 CREATE DOMAIN DMIS AS CHAR(1);
 
+COMMENT ON DOMAIN DMIS IS 'Sim(1) ou Não(0)';
+
 /*==============================================================*/
 /* Domain: DMLEVEL                                              */
 /*==============================================================*/
@@ -553,6 +535,32 @@ CREATE DOMAIN DMVALUE AS DOUBLE PRECISION DEFAULT 0 NOT NULL;
 CREATE DOMAIN DMWEIGHT AS DOUBLE PRECISION DEFAULT 0 NOT NULL;
 
 /*==============================================================*/
+/* Role: SOMENTE_SELECT                                         */
+/*==============================================================*/
+CREATE ROLE SOMENTE_SELECT;
+
+COMMENT ON ROLE SOMENTE_SELECT IS ''
+CREATE OR ALTER EXCEPTION ERRDEL_CHILD_PARENT 'O registro foi usando em outra tabela, com isso não pode ser deletado. Deleção proibida!';
+
+COMMENT ON EXCEPTION ERRDEL_CHILD_PARENT IS 'Comentários';
+
+CREATE OR ALTER EXCEPTION ERRINS_PARENT_NOT_EXIST 'Essa registro depende da existencia de outro registro em outra tabela, e neste momento não existe';
+
+CREATE OR ALTER EXCEPTION ERRORS_GROUP_DISABLE 'O grupo da conta está inativo. Por isso não pode prosseguir. Se deseja realmente prosseguir ative o grupo da conta ou troque o grupo da conta para um grupo que esteja ativo.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_DISABLE 'O usuário e/ou a conta está inativa. Por isso não pode prosseguir.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_EXIST 'O usuário e nem o identificador da conta não está cadastrado, ou seja, a conta de login não existe.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_PARAM 'Não foi passado o nome do usuário e nem o identificador da conta no momento de fazer a transação(inserir, atualizar ou deletar)';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CHILD 'Nessa tabela não pode alterar o registro filho, ou seja, não pode alter o ID de um campo que depende de outra tabela(filho).';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CLOMUN 'Por padrão definido o campo não pode ser modificado.';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CHILD_PARENT 'O registro foi usando em outra tabela, então um ou mias campo não poder ser alterado. Altaração proibida!';
+
+/*==============================================================*/
 /* Table: AETGRUPO                                              */
 /*==============================================================*/
 CREATE TABLE AETGRUPO (
@@ -572,11 +580,13 @@ DESCRICAO_GRUPO      DMDESCRIPTIONLONG              NOT NULL
 COMMENT ON TABLE AETGRUPO IS 'Grupo de Produtos';
 
 /*==============================================================*/
-/* Index: INDEX_AETGRUPO_ID_AETGRUPO                            */
+/* Index: INDEX_AETGRUPO_DESCRICAO                              */
 /*==============================================================*/
-CREATE UNIQUE asc INDEX INDEX_AETGRUPO_ID_AETGRUPO ON AETGRUPO (
+CREATE UNIQUE asc INDEX INDEX_AETGRUPO_DESCRICAO ON AETGRUPO (
 DESCRICAO_GRUPO
 );
+
+GRANT SELECT,REFERENCE ON AETGRUPO TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: AETPRODU                                              */
@@ -605,6 +615,8 @@ PESO_LIQUIDO         DMWEIGHT                       NOT NULL
 
 COMMENT ON TABLE AETPRODU IS 'Cadastro de Produto';
 
+COMMENT ON COLUMN AETPRODU.DESCRICAO_AUXILIAR IS 'Descrição para ser usada no detalhamento do produto, para sair em relatórios ou até mesmo mostrar mais detalhes a respeito do produto na tela do usuário.';
+
 COMMENT ON COLUMN AETPRODU.ATIVO IS 'Marcação para dizer se o produto esta ativo ou inativo. 0 siginifica se esta inativo. 1 significa que esta ativo.';
 
 COMMENT ON COLUMN AETPRODU.TIPO_PRODUTO IS '0 = Produto. 1 = Serviço. 2 = Conjunto. 3 = Grade.';
@@ -629,6 +641,8 @@ DESCRICAO
 CREATE asc INDEX INDEX_AETPRODU_COD_BARRAS ON AETPRODU (
 CODIGO_BARRAS
 );
+
+GRANT SELECT,REFERENCE ON AETPRODU TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: AETSUBGR                                              */
@@ -656,6 +670,8 @@ COMMENT ON TABLE AETSUBGR IS 'Subgrupo de produtos';
 CREATE UNIQUE asc INDEX INDEX_AETSUBGR_ID_AETSUBGR ON AETSUBGR (
 DESCRICAO_SUBGR
 );
+
+GRANT SELECT,REFERENCE ON AETSUBGR TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: AETVALOR                                              */
@@ -723,6 +739,8 @@ CREATE asc INDEX INDEX_AETVALOR_ID_AETVALOR ON AETVALOR (
 ID_AETVALOR
 );
 
+GRANT SELECT,REFERENCE ON AETVALOR TO SOMENTE_SELECT;
+
 /*==============================================================*/
 /* Table: ASTARCHI                                              */
 /*==============================================================*/
@@ -783,6 +801,8 @@ CREATE INDEX INDEX_ASTARCHI_LOG_DELETE ON ASTARCHI (
 LOG_DELETE
 );
 
+GRANT SELECT,REFERENCE ON ASTARCHI TO SOMENTE_SELECT;
+
 /*==============================================================*/
 /* Table: ASTCONTA                                              */
 /*==============================================================*/
@@ -812,6 +832,8 @@ COMMENT ON TABLE ASTCONTA IS 'Tabela de contas onde a conta esta ligado a empres
 CREATE asc INDEX INDEX_ASTCONTA_NOME_CONTA ON ASTCONTA (
 NOME_CONTA
 );
+
+GRANT SELECT,REFERENCE ON ASTCONTA TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: ASTEMPRE                                              */
@@ -872,6 +894,8 @@ CREATE descending INDEX INDEX_ASTEMPRE_NOME_DESC ON ASTEMPRE (
 NOME_EMPRESA
 );
 
+GRANT SELECT,REFERENCE ON ASTEMPRE TO SOMENTE_SELECT;
+
 /*==============================================================*/
 /* Table: ASTFILIA                                              */
 /*==============================================================*/
@@ -890,7 +914,7 @@ CPF_CNPJ             DMCPF_CNPJ                     NOT NULL,
 NOME_RAZAO           DMNAME                         NOT NULL,
 APELIDO_FANTASIA     DMNAME,
 CAMINHO_BANCO_DADOS_LOG DMPATH,
-NOME_BANCO_DADOS_LOG DMPATH                         NOT NULL
+NOME_BANCO_DADOS_LOG DMPATH
 );
 
 COMMENT ON TABLE ASTFILIA IS 'Cadastro de filial. Nesta tabela é para ser cadastrado todas as empresas incluindo o cadastro da matriz. A empresa aqui é considerado quem vai usar o sistema.';
@@ -915,6 +939,8 @@ NOME_RAZAO
 CREATE UNIQUE desc INDEX INDEX_ASTFILIA_CPF_CNPJ_ASC2 ON ASTFILIA (
 CPF_CNPJ
 );
+
+GRANT SELECT,REFERENCE ON ASTFILIA TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: ASTGRCON                                              */
@@ -950,6 +976,8 @@ CREATE UNIQUE INDEX INDEX_ASTGRCON_DESCRICAO ON ASTGRCON (
 DESCRICAO_GRUPO
 );
 
+GRANT SELECT,REFERENCE ON ASTGRCON TO SOMENTE_SELECT;
+
 /*==============================================================*/
 /* Table: ASTLOGER                                              */
 /*==============================================================*/
@@ -978,6 +1006,8 @@ COMMENT ON COLUMN ASTLOGER.TIPO_OPERACAO IS 'Tipo de operação é se é um (I)n
 
 COMMENT ON COLUMN ASTLOGER.ARQUIVO IS 'Nome da tabela que foi gerado o log. Pode ser tambem o nome da função, procedure, etc. Neste campo é pra conter a origem que esta sendo gerado o log.';
 
+COMMENT ON COLUMN ASTLOGER.ID_REGISTRO IS 'ID do registro que foi modificado, ou seja, é o id da tabela descrita no campo ARQUIVO.';
+
 COMMENT ON COLUMN ASTLOGER.DT_OPERACAO IS 'Data e hora que esta gerando o log.';
 
 COMMENT ON COLUMN ASTLOGER.DESCRICAO_LOG IS 'Armazena a descrição do log que deve manter no formato JSON.';
@@ -985,18 +1015,20 @@ COMMENT ON COLUMN ASTLOGER.DESCRICAO_LOG IS 'Armazena a descrição do log que d
 COMMENT ON COLUMN ASTLOGER.ANEXO IS 'Caso queira quardar algo a mais como imagem, print, documento, etc.';
 
 /*==============================================================*/
-/* Index: INDEX_ASTLOGTA_ARCHIVE_ASC                            */
+/* Index: INDEX_ASTLOGER_ARQUIVO_ASC                            */
 /*==============================================================*/
-CREATE ascending INDEX INDEX_ASTLOGTA_ARCHIVE_ASC ON ASTLOGER (
+CREATE ascending INDEX INDEX_ASTLOGER_ARQUIVO_ASC ON ASTLOGER (
 ARQUIVO
 );
 
 /*==============================================================*/
-/* Index: INDEX_ASTLOGTA_ARCHIVE_DESC                           */
+/* Index: INDEX_ASTLOGER_ARQUIVO_DESC                           */
 /*==============================================================*/
-CREATE descending INDEX INDEX_ASTLOGTA_ARCHIVE_DESC ON ASTLOGER (
+CREATE descending INDEX INDEX_ASTLOGER_ARQUIVO_DESC ON ASTLOGER (
 ARQUIVO
 );
+
+GRANT SELECT,REFERENCE ON ASTLOGER TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: ASTREGDE                                              */
@@ -1020,13 +1052,6 @@ UUID_DELETE          DMUUID                         NOT NULL
 COMMENT ON TABLE ASTREGDE IS 'Registro de deletados. Vai entrar nesta tabela os registro que foram deletados.';
 
 /*==============================================================*/
-/* Index: INDEX_ID_ASTREGDE                                     */
-/*==============================================================*/
-CREATE UNIQUE asc INDEX INDEX_ID_ASTREGDE ON ASTREGDE (
-ID_ASTREGDE
-);
-
-/*==============================================================*/
 /* Index: INDEX_ASTREGDE_UUID_DELETE                            */
 /*==============================================================*/
 CREATE asc INDEX INDEX_ASTREGDE_UUID_DELETE ON ASTREGDE (
@@ -1039,6 +1064,8 @@ UUID_DELETE
 CREATE asc INDEX INDEX_ASTREGDE_UUID ON ASTREGDE (
 UUID
 );
+
+GRANT SELECT,REFERENCE ON ASTREGDE TO SOMENTE_SELECT;
 
 /*==============================================================*/
 /* Table: ASTUSUAR                                              */
@@ -1115,6 +1142,8 @@ CREATE asc INDEX INDEX_ASTUSUAR_NUMERO_CELULAR ON ASTUSUAR (
 NUMERO_CELULAR
 );
 
+GRANT SELECT,REFERENCE ON ASTUSUAR TO SOMENTE_SELECT;
+
 /*==============================================================*/
 /* Table: CFTPESSO                                              */
 /*==============================================================*/
@@ -1124,9 +1153,9 @@ ID_ASTEMPRE          DMID,
 UUID                 DMUUID                         NOT NULL,
 USU_CADASTRO         DMUSER,
 ID_ASTCONTA_CADASTRO DMID,
+DT_CADASTRO          DMDATETIME,
 USU_ALTERACAO        DMUSER,
 ID_ASTCONTA_ALTERACAO DMID,
-DT_CADASTRO          DMDATETIME,
 DT_ALTERACAO         DMDATETIME,
 ID_INTEGRATION       DMINTEGRATION,
 CODIGO_CLIENTE       DMID,
@@ -1199,6 +1228,8 @@ CREATE descending INDEX INDEX_CFTPESSO_CNPJ_CPF_DESC ON CFTPESSO (
 CPF_CNPJ
 );
 
+GRANT SELECT,REFERENCE ON CFTPESSO TO SOMENTE_SELECT;
+
 
 SET TERM ^ ;
 
@@ -1269,16 +1300,15 @@ CREATE PROCEDURE PROC_LOG_INSERT (
 RETURNS (
     ID_INSERT INTEGER)
 AS
-DECLARE VARIABLE CAMINHO_BANCO VARCHAR(255);
 DECLARE VARIABLE BANCO_LOG VARCHAR(255);
 DECLARE VARIABLE BANCO_ATUAL VARCHAR(255);
-DECLARE VARIABLE INSTRUCTION BLOB;
 DECLARE VARIABLE REMOTE_PROTOCOL_FB VARCHAR(40);
 DECLARE VARIABLE HOSTNAME_FB VARCHAR(255);
 DECLARE VARIABLE HOST_ADDRESS VARCHAR(255);
 DECLARE VARIABLE CLIENT_VERSION VARCHAR(255);
 DECLARE VARIABLE OS_USER VARCHAR(255);
 DECLARE VARIABLE PROCESS VARCHAR(255);
+DECLARE VARIABLE INSTRUCTION BLOB;
 BEGIN
     ID_INSERT = 0;
     INSTRUCTION = 'INSERT INTO ASTLOGTA (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE,
@@ -1295,37 +1325,39 @@ BEGIN
         ( IIF(:LOG_DESCRIPTION IS NULL, '', :LOG_DESCRIPTION) <> '' )
         ) THEN
         BEGIN
-            SELECT ASTFILIA.CAMINHO_BANCO_DADOS_LOG, ASTFILIA.NOME_BANCO_DADOS_LOG 
-                FROM ASTFILIA 
-                WHERE ASTFILIA.ID_ASTEMPRE = :ID_ASTEMPRE 
-                INTO :CAMINHO_BANCO, :BANCO_LOG;
             
             :DT_OPERATION = IIF(:DT_OPERATION IS NULL, 'NOW', :DT_OPERATION);
             
 			SELECT MON$ATTACHMENTS.MON$REMOTE_PROTOCOL, MON$ATTACHMENTS.MON$REMOTE_HOST, MON$ATTACHMENTS.MON$REMOTE_ADDRESS, MON$ATTACHMENTS.MON$CLIENT_VERSION, MON$ATTACHMENTS.MON$REMOTE_OS_USER, 
-            MON$ATTACHMENTS.MON$REMOTE_PROCESS, RIGHT(MON$ATTACHMENTS.MON$ATTACHMENT_NAME, POSITION('/',REVERSE(MON$ATTACHMENTS.MON$ATTACHMENT_NAME))-1) AS NOME_BANCO
+            MON$ATTACHMENTS.MON$REMOTE_PROCESS, RIGHT(MON$ATTACHMENTS.MON$ATTACHMENT_NAME, POSITION('/',REVERSE(MON$ATTACHMENTS.MON$ATTACHMENT_NAME))-1) AS NOME_BANCO,
+            REPLACE( MON$ATTACHMENTS.MON$ATTACHMENT_NAME, '.fir', '_log.fir' ) AS NOME_BANCO_LOG
 				FROM MON$ATTACHMENTS 
 				WHERE MON$USER = USER AND MON$ATTACHMENT_ID = CURRENT_CONNECTION
-				INTO :REMOTE_PROTOCOL_FB, :HOSTNAME_FB, :HOST_ADDRESS, :CLIENT_VERSION, :OS_USER, :PROCESS, :BANCO_ATUAL;
+				INTO :REMOTE_PROTOCOL_FB, :HOSTNAME_FB, :HOST_ADDRESS, :CLIENT_VERSION, :OS_USER, :PROCESS, :BANCO_ATUAL, :BANCO_LOG;
   
-            EXECUTE STATEMENT (:INSTRUCTION) (
-                ID_ASTCONTA_LOGIN_CREATED := :ID_ASTCONTA_LOGIN, 
-                ID_ASTEMPRE := :ID_ASTEMPRE,
-                TYPE_OPERATION := :TYPE_OPERATION,
-                ARCHIVE := :ARCHIVE,
-                ID_REGISTER := :ID_REGISTER,
-                DT_OPERATION := :DT_OPERATION,
-                REMOTE_PROTOCOL := IIF(:REMOTE_PROTOCOL_FB IS NULL, NULL, :REMOTE_PROTOCOL_FB),
-                HOSTNAME := IIF(:HOSTNAME_FB IS NULL, NULL, :HOSTNAME_FB),
-                HOST_ADDRESS := IIF(:HOST_ADDRESS IS NULL, NULL, :HOST_ADDRESS),
-                APLICATION := IIF(:BANCO_ATUAL IS NULL, NULL, :BANCO_ATUAL),
-                LOG_DESCRIPTION := :LOG_DESCRIPTION,
-                ANEXO := IIF(:ANEXO IS NULL, ( IIF(:PROCESS IS NULL, NULL, :PROCESS) ), (:ANEXO || ' PROCESS - APLICATION ' || :PROCESS )),
-                CLIENT_VERSION := IIF(:CLIENT_VERSION IS NULL, NULL, :CLIENT_VERSION),
-                OS_USER := IIF(:OS_USER IS NULL, NULL, :OS_USER)
-                )
-            ON EXTERNAL DATA SOURCE ( CAMINHO_BANCO || BANCO_LOG )
-            INTO ID_INSERT;
+            IF (
+                ( IIF(:BANCO_LOG IS NULL, '', :BANCO_LOG) <> '' )
+                ) THEN
+            BEGIN
+                EXECUTE STATEMENT (:INSTRUCTION) (
+                    ID_ASTCONTA_LOGIN_CREATED := :ID_ASTCONTA_LOGIN, 
+                    ID_ASTEMPRE := :ID_ASTEMPRE,
+                    TYPE_OPERATION := :TYPE_OPERATION,
+                    ARCHIVE := :ARCHIVE,
+                    ID_REGISTER := :ID_REGISTER,
+                    DT_OPERATION := :DT_OPERATION,
+                    REMOTE_PROTOCOL := IIF(:REMOTE_PROTOCOL_FB IS NULL, NULL, :REMOTE_PROTOCOL_FB),
+                    HOSTNAME := IIF(:HOSTNAME_FB IS NULL, NULL, :HOSTNAME_FB),
+                    HOST_ADDRESS := IIF(:HOST_ADDRESS IS NULL, NULL, :HOST_ADDRESS),
+                    APLICATION := IIF(:BANCO_ATUAL IS NULL, NULL, :BANCO_ATUAL),
+                    LOG_DESCRIPTION := :LOG_DESCRIPTION,
+                    ANEXO := IIF(:ANEXO IS NULL, ( IIF(:PROCESS IS NULL, NULL, :PROCESS) ), (:ANEXO || ' PROCESS - APLICATION ' || :PROCESS )),
+                    CLIENT_VERSION := IIF(:CLIENT_VERSION IS NULL, NULL, :CLIENT_VERSION),
+                    OS_USER := IIF(:OS_USER IS NULL, NULL, :OS_USER)
+                    )
+                ON EXTERNAL DATA SOURCE ( BANCO_LOG )
+                INTO ID_INSERT;
+            END   
         END
 END^
 
@@ -1349,38 +1381,35 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETGRUPO' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETGRUPO', OLD.ID_AETGRUPO, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETGRUPO' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETGRUPO', OLD.ID_AETGRUPO, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_AETGRUPO IS NULL, 0, OLD.ID_AETGRUPO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || OLD.ID_AETGRUPO || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.DESCRICAO_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || '"' || OLD.DESCRICAO_GRUPO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_AETGRUPO IS NULL, 0, OLD.ID_AETGRUPO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || OLD.ID_AETGRUPO || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.DESCRICAO_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || '"' || OLD.DESCRICAO_GRUPO || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1404,34 +1433,32 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETGRUPO' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETGRUPO' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_AETGRUPO IS NULL) AND (NEW.ID_AETGRUPO IS NOT NULL)) OR ((OLD.ID_AETGRUPO IS NOT NULL) AND (NEW.ID_AETGRUPO IS NULL)) OR (OLD.ID_AETGRUPO <> NEW.ID_AETGRUPO)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || IIF(OLD.ID_AETGRUPO IS NULL, 'NULL,', OLD.ID_AETGRUPO || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.DESCRICAO_GRUPO IS NULL) AND (NEW.DESCRICAO_GRUPO IS NOT NULL)) OR ((OLD.DESCRICAO_GRUPO IS NOT NULL) AND (NEW.DESCRICAO_GRUPO IS NULL)) OR (OLD.DESCRICAO_GRUPO <> NEW.DESCRICAO_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || IIF(OLD.DESCRICAO_GRUPO IS NULL, '"",', '"' || OLD.DESCRICAO_GRUPO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_AETGRUPO IS NULL) AND (NEW.ID_AETGRUPO IS NOT NULL)) OR ((OLD.ID_AETGRUPO IS NOT NULL) AND (NEW.ID_AETGRUPO IS NULL)) OR (OLD.ID_AETGRUPO <> NEW.ID_AETGRUPO)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || IIF(OLD.ID_AETGRUPO IS NULL, 'NULL,', OLD.ID_AETGRUPO || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.DESCRICAO_GRUPO IS NULL) AND (NEW.DESCRICAO_GRUPO IS NOT NULL)) OR ((OLD.DESCRICAO_GRUPO IS NOT NULL) AND (NEW.DESCRICAO_GRUPO IS NULL)) OR (OLD.DESCRICAO_GRUPO <> NEW.DESCRICAO_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || IIF(OLD.DESCRICAO_GRUPO IS NULL, '"",', '"' || OLD.DESCRICAO_GRUPO || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETGRUPO', OLD.ID_AETGRUPO, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1488,18 +1515,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETGRUPO"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -1594,46 +1609,43 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETPRODU' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETPRODU', OLD.ID_AETPRODU, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETPRODU' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETPRODU', OLD.ID_AETPRODU, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_AETPRODU IS NULL, 0, OLD.ID_AETPRODU) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || OLD.ID_AETPRODU || ',';                            
-                IF (IIF(OLD.ID_AETGROUP IS NULL, 0, OLD.ID_AETGROUP) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || OLD.ID_AETGROUP || ',';                            
-                IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.CODIGO_BARRAS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CODIGO_BARRAS": ' || '"' || OLD.CODIGO_BARRAS || '",';                            
-                IF (OLD.DESCRICAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || '"' || OLD.DESCRICAO || '",';                            
-                IF (OLD.DESCRICAO_AUXILIAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_AUXILIAR": ' || '"' || OLD.DESCRICAO_AUXILIAR || '",';                            
-                IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
-                IF (OLD.TIPO_PRODUTO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"TIPO_PRODUTO": ' || '"' || OLD.TIPO_PRODUTO || '",';                            
-                IF (OLD.PESO_BRUTO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PESO_BRUTO": ' || '"' || OLD.PESO_BRUTO || '",';                            
-                IF (OLD.PESO_LIQUIDO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PESO_LIQUIDO": ' || '"' || OLD.PESO_LIQUIDO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_AETPRODU IS NULL, 0, OLD.ID_AETPRODU) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || OLD.ID_AETPRODU || ',';                            
+                    IF (IIF(OLD.ID_AETGROUP IS NULL, 0, OLD.ID_AETGROUP) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || OLD.ID_AETGROUP || ',';                            
+                    IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.CODIGO_BARRAS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CODIGO_BARRAS": ' || '"' || OLD.CODIGO_BARRAS || '",';                            
+                    IF (OLD.DESCRICAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || '"' || OLD.DESCRICAO || '",';                            
+                    IF (OLD.DESCRICAO_AUXILIAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_AUXILIAR": ' || '"' || OLD.DESCRICAO_AUXILIAR || '",';                            
+                    IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
+                    IF (OLD.TIPO_PRODUTO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"TIPO_PRODUTO": ' || '"' || OLD.TIPO_PRODUTO || '",';                            
+                    IF (OLD.PESO_BRUTO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PESO_BRUTO": ' || '"' || OLD.PESO_BRUTO || '",';                            
+                    IF (OLD.PESO_LIQUIDO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PESO_LIQUIDO": ' || '"' || OLD.PESO_LIQUIDO || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1657,42 +1669,40 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETPRODU' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETPRODU' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_AETPRODU IS NULL) AND (NEW.ID_AETPRODU IS NOT NULL)) OR ((OLD.ID_AETPRODU IS NOT NULL) AND (NEW.ID_AETPRODU IS NULL)) OR (OLD.ID_AETPRODU <> NEW.ID_AETPRODU)) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || IIF(OLD.ID_AETPRODU IS NULL, 'NULL,', OLD.ID_AETPRODU || ',');                
-                IF (((OLD.ID_AETGROUP IS NULL) AND (NEW.ID_AETGROUP IS NOT NULL)) OR ((OLD.ID_AETGROUP IS NOT NULL) AND (NEW.ID_AETGROUP IS NULL)) OR (OLD.ID_AETGROUP <> NEW.ID_AETGROUP)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || IIF(OLD.ID_AETGROUP IS NULL, 'NULL,', OLD.ID_AETGROUP || ',');                
-                IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.CODIGO_BARRAS IS NULL) AND (NEW.CODIGO_BARRAS IS NOT NULL)) OR ((OLD.CODIGO_BARRAS IS NOT NULL) AND (NEW.CODIGO_BARRAS IS NULL)) OR (OLD.CODIGO_BARRAS <> NEW.CODIGO_BARRAS)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_BARRAS": ' || IIF(OLD.CODIGO_BARRAS IS NULL, '"",', '"' || OLD.CODIGO_BARRAS || '",');            
-                IF (((OLD.DESCRICAO IS NULL) AND (NEW.DESCRICAO IS NOT NULL)) OR ((OLD.DESCRICAO IS NOT NULL) AND (NEW.DESCRICAO IS NULL)) OR (OLD.DESCRICAO <> NEW.DESCRICAO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || IIF(OLD.DESCRICAO IS NULL, '"",', '"' || OLD.DESCRICAO || '",');            
-                IF (((OLD.DESCRICAO_AUXILIAR IS NULL) AND (NEW.DESCRICAO_AUXILIAR IS NOT NULL)) OR ((OLD.DESCRICAO_AUXILIAR IS NOT NULL) AND (NEW.DESCRICAO_AUXILIAR IS NULL)) OR (OLD.DESCRICAO_AUXILIAR <> NEW.DESCRICAO_AUXILIAR)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_AUXILIAR": ' || IIF(OLD.DESCRICAO_AUXILIAR IS NULL, '"",', '"' || OLD.DESCRICAO_AUXILIAR || '",');            
-                IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
-                IF (((OLD.TIPO_PRODUTO IS NULL) AND (NEW.TIPO_PRODUTO IS NOT NULL)) OR ((OLD.TIPO_PRODUTO IS NOT NULL) AND (NEW.TIPO_PRODUTO IS NULL)) OR (OLD.TIPO_PRODUTO <> NEW.TIPO_PRODUTO)) THEN DESC_LOG = :DESC_LOG || '"TIPO_PRODUTO": ' || IIF(OLD.TIPO_PRODUTO IS NULL, '"",', '"' || OLD.TIPO_PRODUTO || '",');            
-                IF (((OLD.PESO_BRUTO IS NULL) AND (NEW.PESO_BRUTO IS NOT NULL)) OR ((OLD.PESO_BRUTO IS NOT NULL) AND (NEW.PESO_BRUTO IS NULL)) OR (OLD.PESO_BRUTO <> NEW.PESO_BRUTO)) THEN DESC_LOG = :DESC_LOG || '"PESO_BRUTO": ' || IIF(OLD.PESO_BRUTO IS NULL, '"",', '"' || OLD.PESO_BRUTO || '",');            
-                IF (((OLD.PESO_LIQUIDO IS NULL) AND (NEW.PESO_LIQUIDO IS NOT NULL)) OR ((OLD.PESO_LIQUIDO IS NOT NULL) AND (NEW.PESO_LIQUIDO IS NULL)) OR (OLD.PESO_LIQUIDO <> NEW.PESO_LIQUIDO)) THEN DESC_LOG = :DESC_LOG || '"PESO_LIQUIDO": ' || IIF(OLD.PESO_LIQUIDO IS NULL, '"",', '"' || OLD.PESO_LIQUIDO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_AETPRODU IS NULL) AND (NEW.ID_AETPRODU IS NOT NULL)) OR ((OLD.ID_AETPRODU IS NOT NULL) AND (NEW.ID_AETPRODU IS NULL)) OR (OLD.ID_AETPRODU <> NEW.ID_AETPRODU)) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || IIF(OLD.ID_AETPRODU IS NULL, 'NULL,', OLD.ID_AETPRODU || ',');                
+                    IF (((OLD.ID_AETGROUP IS NULL) AND (NEW.ID_AETGROUP IS NOT NULL)) OR ((OLD.ID_AETGROUP IS NOT NULL) AND (NEW.ID_AETGROUP IS NULL)) OR (OLD.ID_AETGROUP <> NEW.ID_AETGROUP)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || IIF(OLD.ID_AETGROUP IS NULL, 'NULL,', OLD.ID_AETGROUP || ',');                
+                    IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.CODIGO_BARRAS IS NULL) AND (NEW.CODIGO_BARRAS IS NOT NULL)) OR ((OLD.CODIGO_BARRAS IS NOT NULL) AND (NEW.CODIGO_BARRAS IS NULL)) OR (OLD.CODIGO_BARRAS <> NEW.CODIGO_BARRAS)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_BARRAS": ' || IIF(OLD.CODIGO_BARRAS IS NULL, '"",', '"' || OLD.CODIGO_BARRAS || '",');            
+                    IF (((OLD.DESCRICAO IS NULL) AND (NEW.DESCRICAO IS NOT NULL)) OR ((OLD.DESCRICAO IS NOT NULL) AND (NEW.DESCRICAO IS NULL)) OR (OLD.DESCRICAO <> NEW.DESCRICAO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || IIF(OLD.DESCRICAO IS NULL, '"",', '"' || OLD.DESCRICAO || '",');            
+                    IF (((OLD.DESCRICAO_AUXILIAR IS NULL) AND (NEW.DESCRICAO_AUXILIAR IS NOT NULL)) OR ((OLD.DESCRICAO_AUXILIAR IS NOT NULL) AND (NEW.DESCRICAO_AUXILIAR IS NULL)) OR (OLD.DESCRICAO_AUXILIAR <> NEW.DESCRICAO_AUXILIAR)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_AUXILIAR": ' || IIF(OLD.DESCRICAO_AUXILIAR IS NULL, '"",', '"' || OLD.DESCRICAO_AUXILIAR || '",');            
+                    IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
+                    IF (((OLD.TIPO_PRODUTO IS NULL) AND (NEW.TIPO_PRODUTO IS NOT NULL)) OR ((OLD.TIPO_PRODUTO IS NOT NULL) AND (NEW.TIPO_PRODUTO IS NULL)) OR (OLD.TIPO_PRODUTO <> NEW.TIPO_PRODUTO)) THEN DESC_LOG = :DESC_LOG || '"TIPO_PRODUTO": ' || IIF(OLD.TIPO_PRODUTO IS NULL, '"",', '"' || OLD.TIPO_PRODUTO || '",');            
+                    IF (((OLD.PESO_BRUTO IS NULL) AND (NEW.PESO_BRUTO IS NOT NULL)) OR ((OLD.PESO_BRUTO IS NOT NULL) AND (NEW.PESO_BRUTO IS NULL)) OR (OLD.PESO_BRUTO <> NEW.PESO_BRUTO)) THEN DESC_LOG = :DESC_LOG || '"PESO_BRUTO": ' || IIF(OLD.PESO_BRUTO IS NULL, '"",', '"' || OLD.PESO_BRUTO || '",');            
+                    IF (((OLD.PESO_LIQUIDO IS NULL) AND (NEW.PESO_LIQUIDO IS NOT NULL)) OR ((OLD.PESO_LIQUIDO IS NOT NULL) AND (NEW.PESO_LIQUIDO IS NULL)) OR (OLD.PESO_LIQUIDO <> NEW.PESO_LIQUIDO)) THEN DESC_LOG = :DESC_LOG || '"PESO_LIQUIDO": ' || IIF(OLD.PESO_LIQUIDO IS NULL, '"",', '"' || OLD.PESO_LIQUIDO || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETPRODU', OLD.ID_AETPRODU, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1731,42 +1741,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "AETGRUPO" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETPRODU"  */
-    IF (NEW.ID_AETGROUP IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETGRUPO
-            WHERE AETGRUPO.ID_AETGRUPO = NEW.ID_AETGROUP
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETGROUP || ' na tabela AETGRUPO .');
-       END
-    END
-    /*  NA TEBELA "AETSUBGR" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETPRODU"  */
-    IF (NEW.ID_AETSUBGR IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETSUBGR
-            WHERE AETSUBGR.ID_AETSUBGR = NEW.ID_AETSUBGR
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETSUBGR || ' na tabela AETSUBGR .');
-       END
-    END
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETPRODU"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -1847,39 +1821,36 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETSUBGR' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETSUBGR', OLD.ID_AETSUBGR, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETSUBGR' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETSUBGR', OLD.ID_AETSUBGR, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
-                IF (IIF(OLD.ID_AETGROUP IS NULL, 0, OLD.ID_AETGROUP) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || OLD.ID_AETGROUP || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.DESCRICAO_SUBGR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_SUBGR": ' || '"' || OLD.DESCRICAO_SUBGR || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
+                    IF (IIF(OLD.ID_AETGROUP IS NULL, 0, OLD.ID_AETGROUP) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || OLD.ID_AETGROUP || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.DESCRICAO_SUBGR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_SUBGR": ' || '"' || OLD.DESCRICAO_SUBGR || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1903,35 +1874,33 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETSUBGR' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETSUBGR' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
-                IF (((OLD.ID_AETGROUP IS NULL) AND (NEW.ID_AETGROUP IS NOT NULL)) OR ((OLD.ID_AETGROUP IS NOT NULL) AND (NEW.ID_AETGROUP IS NULL)) OR (OLD.ID_AETGROUP <> NEW.ID_AETGROUP)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || IIF(OLD.ID_AETGROUP IS NULL, 'NULL,', OLD.ID_AETGROUP || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.DESCRICAO_SUBGR IS NULL) AND (NEW.DESCRICAO_SUBGR IS NOT NULL)) OR ((OLD.DESCRICAO_SUBGR IS NOT NULL) AND (NEW.DESCRICAO_SUBGR IS NULL)) OR (OLD.DESCRICAO_SUBGR <> NEW.DESCRICAO_SUBGR)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_SUBGR": ' || IIF(OLD.DESCRICAO_SUBGR IS NULL, '"",', '"' || OLD.DESCRICAO_SUBGR || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
+                    IF (((OLD.ID_AETGROUP IS NULL) AND (NEW.ID_AETGROUP IS NOT NULL)) OR ((OLD.ID_AETGROUP IS NOT NULL) AND (NEW.ID_AETGROUP IS NULL)) OR (OLD.ID_AETGROUP <> NEW.ID_AETGROUP)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGROUP": ' || IIF(OLD.ID_AETGROUP IS NULL, 'NULL,', OLD.ID_AETGROUP || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.DESCRICAO_SUBGR IS NULL) AND (NEW.DESCRICAO_SUBGR IS NOT NULL)) OR ((OLD.DESCRICAO_SUBGR IS NOT NULL) AND (NEW.DESCRICAO_SUBGR IS NULL)) OR (OLD.DESCRICAO_SUBGR <> NEW.DESCRICAO_SUBGR)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_SUBGR": ' || IIF(OLD.DESCRICAO_SUBGR IS NULL, '"",', '"' || OLD.DESCRICAO_SUBGR || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETSUBGR', OLD.ID_AETSUBGR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -1979,30 +1948,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "AETGRUPO" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETSUBGR"  */
-    IF (NEW.ID_AETGROUP IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETGRUPO
-            WHERE AETGRUPO.ID_AETGRUPO = NEW.ID_AETGROUP
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETGROUP || ' na tabela AETGRUPO .');
-       END
-    END
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETSUBGR"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 END;^
 
 SET TERM ; ^;
@@ -2068,56 +2013,53 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETVALOR' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETVALOR', OLD.ID_AETVALOR, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETVALOR' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('AETVALOR', OLD.ID_AETVALOR, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_AETVALOR IS NULL, 0, OLD.ID_AETVALOR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETVALOR": ' || OLD.ID_AETVALOR || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (IIF(OLD.ID_ASTFILIA IS NULL, 0, OLD.ID_ASTFILIA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || OLD.ID_ASTFILIA || ',';                            
-                IF (IIF(OLD.ID_AETGRUPO IS NULL, 0, OLD.ID_AETGRUPO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || OLD.ID_AETGRUPO || ',';                            
-                IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
-                IF (IIF(OLD.ID_AETPRODU IS NULL, 0, OLD.ID_AETPRODU) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || OLD.ID_AETPRODU || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.DESC_PROD_VAREJO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_VISTA": ' || '"' || OLD.DESC_PROD_VAREJO_VISTA || '",';                            
-                IF (OLD.DESC_PROD_VAREJO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_PRAZO": ' || '"' || OLD.DESC_PROD_VAREJO_PRAZO || '",';                            
-                IF (OLD.DESC_PROD_ATACADO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_VISTA": ' || '"' || OLD.DESC_PROD_ATACADO_VISTA || '",';                            
-                IF (OLD.DESC_PROD_ATACADO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_PRAZO": ' || '"' || OLD.DESC_PROD_ATACADO_PRAZO || '",';                            
-                IF (OLD.DESC_SERV_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_VISTA": ' || '"' || OLD.DESC_SERV_VISTA || '",';                            
-                IF (OLD.DESC_SERV_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_PRAZO": ' || '"' || OLD.DESC_SERV_PRAZO || '",';                            
-                IF (OLD.COMI_PROD_VAREJO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_VISTA": ' || '"' || OLD.COMI_PROD_VAREJO_VISTA || '",';                            
-                IF (OLD.COMI_PROD_VAREJO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_PRAZO": ' || '"' || OLD.COMI_PROD_VAREJO_PRAZO || '",';                            
-                IF (OLD.COMI_PROD_ATACADO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_VISTA": ' || '"' || OLD.COMI_PROD_ATACADO_VISTA || '",';                            
-                IF (OLD.COMI_PROD_ATACADO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_PRAZO": ' || '"' || OLD.COMI_PROD_ATACADO_PRAZO || '",';                            
-                IF (OLD.COMI_SERV_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_VISTA": ' || '"' || OLD.COMI_SERV_VISTA || '",';                            
-                IF (OLD.COMI_SERV_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_PRAZO": ' || '"' || OLD.COMI_SERV_PRAZO || '",';                            
-                IF (OLD.MAGE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"MAGE": ' || '"' || OLD.MAGE || '",';                            
-                IF (OLD.PERC_LUCRO_ATACADO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_ATACADO": ' || '"' || OLD.PERC_LUCRO_ATACADO || '",';                            
-                IF (OLD.PERC_LUCRO_SERVICO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_SERVICO": ' || '"' || OLD.PERC_LUCRO_SERVICO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_AETVALOR IS NULL, 0, OLD.ID_AETVALOR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETVALOR": ' || OLD.ID_AETVALOR || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (IIF(OLD.ID_ASTFILIA IS NULL, 0, OLD.ID_ASTFILIA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || OLD.ID_ASTFILIA || ',';                            
+                    IF (IIF(OLD.ID_AETGRUPO IS NULL, 0, OLD.ID_AETGRUPO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || OLD.ID_AETGRUPO || ',';                            
+                    IF (IIF(OLD.ID_AETSUBGR IS NULL, 0, OLD.ID_AETSUBGR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || OLD.ID_AETSUBGR || ',';                            
+                    IF (IIF(OLD.ID_AETPRODU IS NULL, 0, OLD.ID_AETPRODU) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || OLD.ID_AETPRODU || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.DESC_PROD_VAREJO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_VISTA": ' || '"' || OLD.DESC_PROD_VAREJO_VISTA || '",';                            
+                    IF (OLD.DESC_PROD_VAREJO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_PRAZO": ' || '"' || OLD.DESC_PROD_VAREJO_PRAZO || '",';                            
+                    IF (OLD.DESC_PROD_ATACADO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_VISTA": ' || '"' || OLD.DESC_PROD_ATACADO_VISTA || '",';                            
+                    IF (OLD.DESC_PROD_ATACADO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_PRAZO": ' || '"' || OLD.DESC_PROD_ATACADO_PRAZO || '",';                            
+                    IF (OLD.DESC_SERV_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_VISTA": ' || '"' || OLD.DESC_SERV_VISTA || '",';                            
+                    IF (OLD.DESC_SERV_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_PRAZO": ' || '"' || OLD.DESC_SERV_PRAZO || '",';                            
+                    IF (OLD.COMI_PROD_VAREJO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_VISTA": ' || '"' || OLD.COMI_PROD_VAREJO_VISTA || '",';                            
+                    IF (OLD.COMI_PROD_VAREJO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_PRAZO": ' || '"' || OLD.COMI_PROD_VAREJO_PRAZO || '",';                            
+                    IF (OLD.COMI_PROD_ATACADO_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_VISTA": ' || '"' || OLD.COMI_PROD_ATACADO_VISTA || '",';                            
+                    IF (OLD.COMI_PROD_ATACADO_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_PRAZO": ' || '"' || OLD.COMI_PROD_ATACADO_PRAZO || '",';                            
+                    IF (OLD.COMI_SERV_VISTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_VISTA": ' || '"' || OLD.COMI_SERV_VISTA || '",';                            
+                    IF (OLD.COMI_SERV_PRAZO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_PRAZO": ' || '"' || OLD.COMI_SERV_PRAZO || '",';                            
+                    IF (OLD.MAGE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"MAGE": ' || '"' || OLD.MAGE || '",';                            
+                    IF (OLD.PERC_LUCRO_ATACADO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_ATACADO": ' || '"' || OLD.PERC_LUCRO_ATACADO || '",';                            
+                    IF (OLD.PERC_LUCRO_SERVICO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_SERVICO": ' || '"' || OLD.PERC_LUCRO_SERVICO || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2141,52 +2083,50 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'AETVALOR' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'AETVALOR' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_AETVALOR IS NULL) AND (NEW.ID_AETVALOR IS NOT NULL)) OR ((OLD.ID_AETVALOR IS NOT NULL) AND (NEW.ID_AETVALOR IS NULL)) OR (OLD.ID_AETVALOR <> NEW.ID_AETVALOR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETVALOR": ' || IIF(OLD.ID_AETVALOR IS NULL, 'NULL,', OLD.ID_AETVALOR || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');                
-                IF (((OLD.ID_ASTFILIA IS NULL) AND (NEW.ID_ASTFILIA IS NOT NULL)) OR ((OLD.ID_ASTFILIA IS NOT NULL) AND (NEW.ID_ASTFILIA IS NULL)) OR (OLD.ID_ASTFILIA <> NEW.ID_ASTFILIA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || IIF(OLD.ID_ASTFILIA IS NULL, 'NULL,', OLD.ID_ASTFILIA || ',');                
-                IF (((OLD.ID_AETGRUPO IS NULL) AND (NEW.ID_AETGRUPO IS NOT NULL)) OR ((OLD.ID_AETGRUPO IS NOT NULL) AND (NEW.ID_AETGRUPO IS NULL)) OR (OLD.ID_AETGRUPO <> NEW.ID_AETGRUPO)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || IIF(OLD.ID_AETGRUPO IS NULL, 'NULL,', OLD.ID_AETGRUPO || ',');                
-                IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
-                IF (((OLD.ID_AETPRODU IS NULL) AND (NEW.ID_AETPRODU IS NOT NULL)) OR ((OLD.ID_AETPRODU IS NOT NULL) AND (NEW.ID_AETPRODU IS NULL)) OR (OLD.ID_AETPRODU <> NEW.ID_AETPRODU)) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || IIF(OLD.ID_AETPRODU IS NULL, 'NULL,', OLD.ID_AETPRODU || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.DESC_PROD_VAREJO_VISTA IS NULL) AND (NEW.DESC_PROD_VAREJO_VISTA IS NOT NULL)) OR ((OLD.DESC_PROD_VAREJO_VISTA IS NOT NULL) AND (NEW.DESC_PROD_VAREJO_VISTA IS NULL)) OR (OLD.DESC_PROD_VAREJO_VISTA <> NEW.DESC_PROD_VAREJO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_VISTA": ' || IIF(OLD.DESC_PROD_VAREJO_VISTA IS NULL, '"",', '"' || OLD.DESC_PROD_VAREJO_VISTA || '",');            
-                IF (((OLD.DESC_PROD_VAREJO_PRAZO IS NULL) AND (NEW.DESC_PROD_VAREJO_PRAZO IS NOT NULL)) OR ((OLD.DESC_PROD_VAREJO_PRAZO IS NOT NULL) AND (NEW.DESC_PROD_VAREJO_PRAZO IS NULL)) OR (OLD.DESC_PROD_VAREJO_PRAZO <> NEW.DESC_PROD_VAREJO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_PRAZO": ' || IIF(OLD.DESC_PROD_VAREJO_PRAZO IS NULL, '"",', '"' || OLD.DESC_PROD_VAREJO_PRAZO || '",');            
-                IF (((OLD.DESC_PROD_ATACADO_VISTA IS NULL) AND (NEW.DESC_PROD_ATACADO_VISTA IS NOT NULL)) OR ((OLD.DESC_PROD_ATACADO_VISTA IS NOT NULL) AND (NEW.DESC_PROD_ATACADO_VISTA IS NULL)) OR (OLD.DESC_PROD_ATACADO_VISTA <> NEW.DESC_PROD_ATACADO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_VISTA": ' || IIF(OLD.DESC_PROD_ATACADO_VISTA IS NULL, '"",', '"' || OLD.DESC_PROD_ATACADO_VISTA || '",');            
-                IF (((OLD.DESC_PROD_ATACADO_PRAZO IS NULL) AND (NEW.DESC_PROD_ATACADO_PRAZO IS NOT NULL)) OR ((OLD.DESC_PROD_ATACADO_PRAZO IS NOT NULL) AND (NEW.DESC_PROD_ATACADO_PRAZO IS NULL)) OR (OLD.DESC_PROD_ATACADO_PRAZO <> NEW.DESC_PROD_ATACADO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_PRAZO": ' || IIF(OLD.DESC_PROD_ATACADO_PRAZO IS NULL, '"",', '"' || OLD.DESC_PROD_ATACADO_PRAZO || '",');            
-                IF (((OLD.DESC_SERV_VISTA IS NULL) AND (NEW.DESC_SERV_VISTA IS NOT NULL)) OR ((OLD.DESC_SERV_VISTA IS NOT NULL) AND (NEW.DESC_SERV_VISTA IS NULL)) OR (OLD.DESC_SERV_VISTA <> NEW.DESC_SERV_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_VISTA": ' || IIF(OLD.DESC_SERV_VISTA IS NULL, '"",', '"' || OLD.DESC_SERV_VISTA || '",');            
-                IF (((OLD.DESC_SERV_PRAZO IS NULL) AND (NEW.DESC_SERV_PRAZO IS NOT NULL)) OR ((OLD.DESC_SERV_PRAZO IS NOT NULL) AND (NEW.DESC_SERV_PRAZO IS NULL)) OR (OLD.DESC_SERV_PRAZO <> NEW.DESC_SERV_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_PRAZO": ' || IIF(OLD.DESC_SERV_PRAZO IS NULL, '"",', '"' || OLD.DESC_SERV_PRAZO || '",');            
-                IF (((OLD.COMI_PROD_VAREJO_VISTA IS NULL) AND (NEW.COMI_PROD_VAREJO_VISTA IS NOT NULL)) OR ((OLD.COMI_PROD_VAREJO_VISTA IS NOT NULL) AND (NEW.COMI_PROD_VAREJO_VISTA IS NULL)) OR (OLD.COMI_PROD_VAREJO_VISTA <> NEW.COMI_PROD_VAREJO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_VISTA": ' || IIF(OLD.COMI_PROD_VAREJO_VISTA IS NULL, '"",', '"' || OLD.COMI_PROD_VAREJO_VISTA || '",');            
-                IF (((OLD.COMI_PROD_VAREJO_PRAZO IS NULL) AND (NEW.COMI_PROD_VAREJO_PRAZO IS NOT NULL)) OR ((OLD.COMI_PROD_VAREJO_PRAZO IS NOT NULL) AND (NEW.COMI_PROD_VAREJO_PRAZO IS NULL)) OR (OLD.COMI_PROD_VAREJO_PRAZO <> NEW.COMI_PROD_VAREJO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_PRAZO": ' || IIF(OLD.COMI_PROD_VAREJO_PRAZO IS NULL, '"",', '"' || OLD.COMI_PROD_VAREJO_PRAZO || '",');            
-                IF (((OLD.COMI_PROD_ATACADO_VISTA IS NULL) AND (NEW.COMI_PROD_ATACADO_VISTA IS NOT NULL)) OR ((OLD.COMI_PROD_ATACADO_VISTA IS NOT NULL) AND (NEW.COMI_PROD_ATACADO_VISTA IS NULL)) OR (OLD.COMI_PROD_ATACADO_VISTA <> NEW.COMI_PROD_ATACADO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_VISTA": ' || IIF(OLD.COMI_PROD_ATACADO_VISTA IS NULL, '"",', '"' || OLD.COMI_PROD_ATACADO_VISTA || '",');            
-                IF (((OLD.COMI_PROD_ATACADO_PRAZO IS NULL) AND (NEW.COMI_PROD_ATACADO_PRAZO IS NOT NULL)) OR ((OLD.COMI_PROD_ATACADO_PRAZO IS NOT NULL) AND (NEW.COMI_PROD_ATACADO_PRAZO IS NULL)) OR (OLD.COMI_PROD_ATACADO_PRAZO <> NEW.COMI_PROD_ATACADO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_PRAZO": ' || IIF(OLD.COMI_PROD_ATACADO_PRAZO IS NULL, '"",', '"' || OLD.COMI_PROD_ATACADO_PRAZO || '",');            
-                IF (((OLD.COMI_SERV_VISTA IS NULL) AND (NEW.COMI_SERV_VISTA IS NOT NULL)) OR ((OLD.COMI_SERV_VISTA IS NOT NULL) AND (NEW.COMI_SERV_VISTA IS NULL)) OR (OLD.COMI_SERV_VISTA <> NEW.COMI_SERV_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_VISTA": ' || IIF(OLD.COMI_SERV_VISTA IS NULL, '"",', '"' || OLD.COMI_SERV_VISTA || '",');            
-                IF (((OLD.COMI_SERV_PRAZO IS NULL) AND (NEW.COMI_SERV_PRAZO IS NOT NULL)) OR ((OLD.COMI_SERV_PRAZO IS NOT NULL) AND (NEW.COMI_SERV_PRAZO IS NULL)) OR (OLD.COMI_SERV_PRAZO <> NEW.COMI_SERV_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_PRAZO": ' || IIF(OLD.COMI_SERV_PRAZO IS NULL, '"",', '"' || OLD.COMI_SERV_PRAZO || '",');            
-                IF (((OLD.MAGE IS NULL) AND (NEW.MAGE IS NOT NULL)) OR ((OLD.MAGE IS NOT NULL) AND (NEW.MAGE IS NULL)) OR (OLD.MAGE <> NEW.MAGE)) THEN DESC_LOG = :DESC_LOG || '"MAGE": ' || IIF(OLD.MAGE IS NULL, '"",', '"' || OLD.MAGE || '",');            
-                IF (((OLD.PERC_LUCRO_ATACADO IS NULL) AND (NEW.PERC_LUCRO_ATACADO IS NOT NULL)) OR ((OLD.PERC_LUCRO_ATACADO IS NOT NULL) AND (NEW.PERC_LUCRO_ATACADO IS NULL)) OR (OLD.PERC_LUCRO_ATACADO <> NEW.PERC_LUCRO_ATACADO)) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_ATACADO": ' || IIF(OLD.PERC_LUCRO_ATACADO IS NULL, '"",', '"' || OLD.PERC_LUCRO_ATACADO || '",');            
-                IF (((OLD.PERC_LUCRO_SERVICO IS NULL) AND (NEW.PERC_LUCRO_SERVICO IS NOT NULL)) OR ((OLD.PERC_LUCRO_SERVICO IS NOT NULL) AND (NEW.PERC_LUCRO_SERVICO IS NULL)) OR (OLD.PERC_LUCRO_SERVICO <> NEW.PERC_LUCRO_SERVICO)) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_SERVICO": ' || IIF(OLD.PERC_LUCRO_SERVICO IS NULL, '"",', '"' || OLD.PERC_LUCRO_SERVICO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_AETVALOR IS NULL) AND (NEW.ID_AETVALOR IS NOT NULL)) OR ((OLD.ID_AETVALOR IS NOT NULL) AND (NEW.ID_AETVALOR IS NULL)) OR (OLD.ID_AETVALOR <> NEW.ID_AETVALOR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETVALOR": ' || IIF(OLD.ID_AETVALOR IS NULL, 'NULL,', OLD.ID_AETVALOR || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');                
+                    IF (((OLD.ID_ASTFILIA IS NULL) AND (NEW.ID_ASTFILIA IS NOT NULL)) OR ((OLD.ID_ASTFILIA IS NOT NULL) AND (NEW.ID_ASTFILIA IS NULL)) OR (OLD.ID_ASTFILIA <> NEW.ID_ASTFILIA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || IIF(OLD.ID_ASTFILIA IS NULL, 'NULL,', OLD.ID_ASTFILIA || ',');                
+                    IF (((OLD.ID_AETGRUPO IS NULL) AND (NEW.ID_AETGRUPO IS NOT NULL)) OR ((OLD.ID_AETGRUPO IS NOT NULL) AND (NEW.ID_AETGRUPO IS NULL)) OR (OLD.ID_AETGRUPO <> NEW.ID_AETGRUPO)) THEN DESC_LOG = :DESC_LOG || '"ID_AETGRUPO": ' || IIF(OLD.ID_AETGRUPO IS NULL, 'NULL,', OLD.ID_AETGRUPO || ',');                
+                    IF (((OLD.ID_AETSUBGR IS NULL) AND (NEW.ID_AETSUBGR IS NOT NULL)) OR ((OLD.ID_AETSUBGR IS NOT NULL) AND (NEW.ID_AETSUBGR IS NULL)) OR (OLD.ID_AETSUBGR <> NEW.ID_AETSUBGR)) THEN DESC_LOG = :DESC_LOG || '"ID_AETSUBGR": ' || IIF(OLD.ID_AETSUBGR IS NULL, 'NULL,', OLD.ID_AETSUBGR || ',');                
+                    IF (((OLD.ID_AETPRODU IS NULL) AND (NEW.ID_AETPRODU IS NOT NULL)) OR ((OLD.ID_AETPRODU IS NOT NULL) AND (NEW.ID_AETPRODU IS NULL)) OR (OLD.ID_AETPRODU <> NEW.ID_AETPRODU)) THEN DESC_LOG = :DESC_LOG || '"ID_AETPRODU": ' || IIF(OLD.ID_AETPRODU IS NULL, 'NULL,', OLD.ID_AETPRODU || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.DESC_PROD_VAREJO_VISTA IS NULL) AND (NEW.DESC_PROD_VAREJO_VISTA IS NOT NULL)) OR ((OLD.DESC_PROD_VAREJO_VISTA IS NOT NULL) AND (NEW.DESC_PROD_VAREJO_VISTA IS NULL)) OR (OLD.DESC_PROD_VAREJO_VISTA <> NEW.DESC_PROD_VAREJO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_VISTA": ' || IIF(OLD.DESC_PROD_VAREJO_VISTA IS NULL, '"",', '"' || OLD.DESC_PROD_VAREJO_VISTA || '",');            
+                    IF (((OLD.DESC_PROD_VAREJO_PRAZO IS NULL) AND (NEW.DESC_PROD_VAREJO_PRAZO IS NOT NULL)) OR ((OLD.DESC_PROD_VAREJO_PRAZO IS NOT NULL) AND (NEW.DESC_PROD_VAREJO_PRAZO IS NULL)) OR (OLD.DESC_PROD_VAREJO_PRAZO <> NEW.DESC_PROD_VAREJO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_VAREJO_PRAZO": ' || IIF(OLD.DESC_PROD_VAREJO_PRAZO IS NULL, '"",', '"' || OLD.DESC_PROD_VAREJO_PRAZO || '",');            
+                    IF (((OLD.DESC_PROD_ATACADO_VISTA IS NULL) AND (NEW.DESC_PROD_ATACADO_VISTA IS NOT NULL)) OR ((OLD.DESC_PROD_ATACADO_VISTA IS NOT NULL) AND (NEW.DESC_PROD_ATACADO_VISTA IS NULL)) OR (OLD.DESC_PROD_ATACADO_VISTA <> NEW.DESC_PROD_ATACADO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_VISTA": ' || IIF(OLD.DESC_PROD_ATACADO_VISTA IS NULL, '"",', '"' || OLD.DESC_PROD_ATACADO_VISTA || '",');            
+                    IF (((OLD.DESC_PROD_ATACADO_PRAZO IS NULL) AND (NEW.DESC_PROD_ATACADO_PRAZO IS NOT NULL)) OR ((OLD.DESC_PROD_ATACADO_PRAZO IS NOT NULL) AND (NEW.DESC_PROD_ATACADO_PRAZO IS NULL)) OR (OLD.DESC_PROD_ATACADO_PRAZO <> NEW.DESC_PROD_ATACADO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_PROD_ATACADO_PRAZO": ' || IIF(OLD.DESC_PROD_ATACADO_PRAZO IS NULL, '"",', '"' || OLD.DESC_PROD_ATACADO_PRAZO || '",');            
+                    IF (((OLD.DESC_SERV_VISTA IS NULL) AND (NEW.DESC_SERV_VISTA IS NOT NULL)) OR ((OLD.DESC_SERV_VISTA IS NOT NULL) AND (NEW.DESC_SERV_VISTA IS NULL)) OR (OLD.DESC_SERV_VISTA <> NEW.DESC_SERV_VISTA)) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_VISTA": ' || IIF(OLD.DESC_SERV_VISTA IS NULL, '"",', '"' || OLD.DESC_SERV_VISTA || '",');            
+                    IF (((OLD.DESC_SERV_PRAZO IS NULL) AND (NEW.DESC_SERV_PRAZO IS NOT NULL)) OR ((OLD.DESC_SERV_PRAZO IS NOT NULL) AND (NEW.DESC_SERV_PRAZO IS NULL)) OR (OLD.DESC_SERV_PRAZO <> NEW.DESC_SERV_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"DESC_SERV_PRAZO": ' || IIF(OLD.DESC_SERV_PRAZO IS NULL, '"",', '"' || OLD.DESC_SERV_PRAZO || '",');            
+                    IF (((OLD.COMI_PROD_VAREJO_VISTA IS NULL) AND (NEW.COMI_PROD_VAREJO_VISTA IS NOT NULL)) OR ((OLD.COMI_PROD_VAREJO_VISTA IS NOT NULL) AND (NEW.COMI_PROD_VAREJO_VISTA IS NULL)) OR (OLD.COMI_PROD_VAREJO_VISTA <> NEW.COMI_PROD_VAREJO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_VISTA": ' || IIF(OLD.COMI_PROD_VAREJO_VISTA IS NULL, '"",', '"' || OLD.COMI_PROD_VAREJO_VISTA || '",');            
+                    IF (((OLD.COMI_PROD_VAREJO_PRAZO IS NULL) AND (NEW.COMI_PROD_VAREJO_PRAZO IS NOT NULL)) OR ((OLD.COMI_PROD_VAREJO_PRAZO IS NOT NULL) AND (NEW.COMI_PROD_VAREJO_PRAZO IS NULL)) OR (OLD.COMI_PROD_VAREJO_PRAZO <> NEW.COMI_PROD_VAREJO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_VAREJO_PRAZO": ' || IIF(OLD.COMI_PROD_VAREJO_PRAZO IS NULL, '"",', '"' || OLD.COMI_PROD_VAREJO_PRAZO || '",');            
+                    IF (((OLD.COMI_PROD_ATACADO_VISTA IS NULL) AND (NEW.COMI_PROD_ATACADO_VISTA IS NOT NULL)) OR ((OLD.COMI_PROD_ATACADO_VISTA IS NOT NULL) AND (NEW.COMI_PROD_ATACADO_VISTA IS NULL)) OR (OLD.COMI_PROD_ATACADO_VISTA <> NEW.COMI_PROD_ATACADO_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_VISTA": ' || IIF(OLD.COMI_PROD_ATACADO_VISTA IS NULL, '"",', '"' || OLD.COMI_PROD_ATACADO_VISTA || '",');            
+                    IF (((OLD.COMI_PROD_ATACADO_PRAZO IS NULL) AND (NEW.COMI_PROD_ATACADO_PRAZO IS NOT NULL)) OR ((OLD.COMI_PROD_ATACADO_PRAZO IS NOT NULL) AND (NEW.COMI_PROD_ATACADO_PRAZO IS NULL)) OR (OLD.COMI_PROD_ATACADO_PRAZO <> NEW.COMI_PROD_ATACADO_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_PROD_ATACADO_PRAZO": ' || IIF(OLD.COMI_PROD_ATACADO_PRAZO IS NULL, '"",', '"' || OLD.COMI_PROD_ATACADO_PRAZO || '",');            
+                    IF (((OLD.COMI_SERV_VISTA IS NULL) AND (NEW.COMI_SERV_VISTA IS NOT NULL)) OR ((OLD.COMI_SERV_VISTA IS NOT NULL) AND (NEW.COMI_SERV_VISTA IS NULL)) OR (OLD.COMI_SERV_VISTA <> NEW.COMI_SERV_VISTA)) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_VISTA": ' || IIF(OLD.COMI_SERV_VISTA IS NULL, '"",', '"' || OLD.COMI_SERV_VISTA || '",');            
+                    IF (((OLD.COMI_SERV_PRAZO IS NULL) AND (NEW.COMI_SERV_PRAZO IS NOT NULL)) OR ((OLD.COMI_SERV_PRAZO IS NOT NULL) AND (NEW.COMI_SERV_PRAZO IS NULL)) OR (OLD.COMI_SERV_PRAZO <> NEW.COMI_SERV_PRAZO)) THEN DESC_LOG = :DESC_LOG || '"COMI_SERV_PRAZO": ' || IIF(OLD.COMI_SERV_PRAZO IS NULL, '"",', '"' || OLD.COMI_SERV_PRAZO || '",');            
+                    IF (((OLD.MAGE IS NULL) AND (NEW.MAGE IS NOT NULL)) OR ((OLD.MAGE IS NOT NULL) AND (NEW.MAGE IS NULL)) OR (OLD.MAGE <> NEW.MAGE)) THEN DESC_LOG = :DESC_LOG || '"MAGE": ' || IIF(OLD.MAGE IS NULL, '"",', '"' || OLD.MAGE || '",');            
+                    IF (((OLD.PERC_LUCRO_ATACADO IS NULL) AND (NEW.PERC_LUCRO_ATACADO IS NOT NULL)) OR ((OLD.PERC_LUCRO_ATACADO IS NOT NULL) AND (NEW.PERC_LUCRO_ATACADO IS NULL)) OR (OLD.PERC_LUCRO_ATACADO <> NEW.PERC_LUCRO_ATACADO)) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_ATACADO": ' || IIF(OLD.PERC_LUCRO_ATACADO IS NULL, '"",', '"' || OLD.PERC_LUCRO_ATACADO || '",');            
+                    IF (((OLD.PERC_LUCRO_SERVICO IS NULL) AND (NEW.PERC_LUCRO_SERVICO IS NOT NULL)) OR ((OLD.PERC_LUCRO_SERVICO IS NOT NULL) AND (NEW.PERC_LUCRO_SERVICO IS NULL)) OR (OLD.PERC_LUCRO_SERVICO <> NEW.PERC_LUCRO_SERVICO)) THEN DESC_LOG = :DESC_LOG || '"PERC_LUCRO_SERVICO": ' || IIF(OLD.PERC_LUCRO_SERVICO IS NULL, '"",', '"' || OLD.PERC_LUCRO_SERVICO || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'AETVALOR', OLD.ID_AETVALOR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2202,66 +2142,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "AETGRUPO" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETVALOR"  */
-    IF (NEW.ID_AETGRUPO IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETGRUPO
-            WHERE AETGRUPO.ID_AETGRUPO = NEW.ID_AETGRUPO
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETGRUPO || ' na tabela AETGRUPO .');
-       END
-    END
-    /*  NA TEBELA "AETSUBGR" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETVALOR"  */
-    IF (NEW.ID_AETSUBGR IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETSUBGR
-            WHERE AETSUBGR.ID_AETSUBGR = NEW.ID_AETSUBGR
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETSUBGR || ' na tabela AETSUBGR .');
-       END
-    END
-    /*  NA TEBELA "AETPRODU" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETVALOR"  */
-    IF (NEW.ID_AETPRODU IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM AETPRODU
-            WHERE AETPRODU.ID_AETPRODU = NEW.ID_AETPRODU
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_AETPRODU || ' na tabela AETPRODU .');
-       END
-    END
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETVALOR"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
-    /*  NA TEBELA "ASTFILIA" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "AETVALOR"  */
-    IF (NEW.ID_ASTFILIA IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTFILIA
-            WHERE ASTFILIA.ID_ASTFILIA = NEW.ID_ASTFILIA
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTFILIA || ' na tabela ASTFILIA .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -2335,43 +2215,40 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTARCHI' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTARCHI', OLD.ID_ASTARCHI, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTARCHI' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTARCHI', OLD.ID_ASTARCHI, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTARCHI IS NULL, 0, OLD.ID_ASTARCHI) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTARCHI": ' || OLD.ID_ASTARCHI || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.FILE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"FILE": ' || '"' || OLD.FILE || '",';                            
-                IF (OLD.DESCRICAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || '"' || OLD.DESCRICAO || '",';                            
-                IF (OLD.TYPE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"TYPE": ' || '"' || OLD.TYPE || '",';                            
-                IF (OLD.LOG_ALTER IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"LOG_ALTER": ' || '"' || OLD.LOG_ALTER || '",';                            
-                IF (OLD.LOG_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"LOG_DELETE": ' || '"' || OLD.LOG_DELETE || '",';                            
-                IF (OLD.SAVE_ID_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SAVE_ID_DELETE": ' || '"' || OLD.SAVE_ID_DELETE || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTARCHI IS NULL, 0, OLD.ID_ASTARCHI) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTARCHI": ' || OLD.ID_ASTARCHI || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.FILE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"FILE": ' || '"' || OLD.FILE || '",';                            
+                    IF (OLD.DESCRICAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || '"' || OLD.DESCRICAO || '",';                            
+                    IF (OLD.TYPE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"TYPE": ' || '"' || OLD.TYPE || '",';                            
+                    IF (OLD.LOG_ALTER IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"LOG_ALTER": ' || '"' || OLD.LOG_ALTER || '",';                            
+                    IF (OLD.LOG_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"LOG_DELETE": ' || '"' || OLD.LOG_DELETE || '",';                            
+                    IF (OLD.SAVE_ID_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SAVE_ID_DELETE": ' || '"' || OLD.SAVE_ID_DELETE || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2395,39 +2272,37 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTARCHI' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTARCHI' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTARCHI IS NULL) AND (NEW.ID_ASTARCHI IS NOT NULL)) OR ((OLD.ID_ASTARCHI IS NOT NULL) AND (NEW.ID_ASTARCHI IS NULL)) OR (OLD.ID_ASTARCHI <> NEW.ID_ASTARCHI)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTARCHI": ' || IIF(OLD.ID_ASTARCHI IS NULL, 'NULL,', OLD.ID_ASTARCHI || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.FILE IS NULL) AND (NEW.FILE IS NOT NULL)) OR ((OLD.FILE IS NOT NULL) AND (NEW.FILE IS NULL)) OR (OLD.FILE <> NEW.FILE)) THEN DESC_LOG = :DESC_LOG || '"FILE": ' || IIF(OLD.FILE IS NULL, '"",', '"' || OLD.FILE || '",');            
-                IF (((OLD.DESCRICAO IS NULL) AND (NEW.DESCRICAO IS NOT NULL)) OR ((OLD.DESCRICAO IS NOT NULL) AND (NEW.DESCRICAO IS NULL)) OR (OLD.DESCRICAO <> NEW.DESCRICAO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || IIF(OLD.DESCRICAO IS NULL, '"",', '"' || OLD.DESCRICAO || '",');            
-                IF (((OLD.TYPE IS NULL) AND (NEW.TYPE IS NOT NULL)) OR ((OLD.TYPE IS NOT NULL) AND (NEW.TYPE IS NULL)) OR (OLD.TYPE <> NEW.TYPE)) THEN DESC_LOG = :DESC_LOG || '"TYPE": ' || IIF(OLD.TYPE IS NULL, '"",', '"' || OLD.TYPE || '",');            
-                IF (((OLD.LOG_ALTER IS NULL) AND (NEW.LOG_ALTER IS NOT NULL)) OR ((OLD.LOG_ALTER IS NOT NULL) AND (NEW.LOG_ALTER IS NULL)) OR (OLD.LOG_ALTER <> NEW.LOG_ALTER)) THEN DESC_LOG = :DESC_LOG || '"LOG_ALTER": ' || IIF(OLD.LOG_ALTER IS NULL, '"",', '"' || OLD.LOG_ALTER || '",');            
-                IF (((OLD.LOG_DELETE IS NULL) AND (NEW.LOG_DELETE IS NOT NULL)) OR ((OLD.LOG_DELETE IS NOT NULL) AND (NEW.LOG_DELETE IS NULL)) OR (OLD.LOG_DELETE <> NEW.LOG_DELETE)) THEN DESC_LOG = :DESC_LOG || '"LOG_DELETE": ' || IIF(OLD.LOG_DELETE IS NULL, '"",', '"' || OLD.LOG_DELETE || '",');            
-                IF (((OLD.SAVE_ID_DELETE IS NULL) AND (NEW.SAVE_ID_DELETE IS NOT NULL)) OR ((OLD.SAVE_ID_DELETE IS NOT NULL) AND (NEW.SAVE_ID_DELETE IS NULL)) OR (OLD.SAVE_ID_DELETE <> NEW.SAVE_ID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"SAVE_ID_DELETE": ' || IIF(OLD.SAVE_ID_DELETE IS NULL, '"",', '"' || OLD.SAVE_ID_DELETE || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTARCHI IS NULL) AND (NEW.ID_ASTARCHI IS NOT NULL)) OR ((OLD.ID_ASTARCHI IS NOT NULL) AND (NEW.ID_ASTARCHI IS NULL)) OR (OLD.ID_ASTARCHI <> NEW.ID_ASTARCHI)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTARCHI": ' || IIF(OLD.ID_ASTARCHI IS NULL, 'NULL,', OLD.ID_ASTARCHI || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.FILE IS NULL) AND (NEW.FILE IS NOT NULL)) OR ((OLD.FILE IS NOT NULL) AND (NEW.FILE IS NULL)) OR (OLD.FILE <> NEW.FILE)) THEN DESC_LOG = :DESC_LOG || '"FILE": ' || IIF(OLD.FILE IS NULL, '"",', '"' || OLD.FILE || '",');            
+                    IF (((OLD.DESCRICAO IS NULL) AND (NEW.DESCRICAO IS NOT NULL)) OR ((OLD.DESCRICAO IS NOT NULL) AND (NEW.DESCRICAO IS NULL)) OR (OLD.DESCRICAO <> NEW.DESCRICAO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO": ' || IIF(OLD.DESCRICAO IS NULL, '"",', '"' || OLD.DESCRICAO || '",');            
+                    IF (((OLD.TYPE IS NULL) AND (NEW.TYPE IS NOT NULL)) OR ((OLD.TYPE IS NOT NULL) AND (NEW.TYPE IS NULL)) OR (OLD.TYPE <> NEW.TYPE)) THEN DESC_LOG = :DESC_LOG || '"TYPE": ' || IIF(OLD.TYPE IS NULL, '"",', '"' || OLD.TYPE || '",');            
+                    IF (((OLD.LOG_ALTER IS NULL) AND (NEW.LOG_ALTER IS NOT NULL)) OR ((OLD.LOG_ALTER IS NOT NULL) AND (NEW.LOG_ALTER IS NULL)) OR (OLD.LOG_ALTER <> NEW.LOG_ALTER)) THEN DESC_LOG = :DESC_LOG || '"LOG_ALTER": ' || IIF(OLD.LOG_ALTER IS NULL, '"",', '"' || OLD.LOG_ALTER || '",');            
+                    IF (((OLD.LOG_DELETE IS NULL) AND (NEW.LOG_DELETE IS NOT NULL)) OR ((OLD.LOG_DELETE IS NOT NULL) AND (NEW.LOG_DELETE IS NULL)) OR (OLD.LOG_DELETE <> NEW.LOG_DELETE)) THEN DESC_LOG = :DESC_LOG || '"LOG_DELETE": ' || IIF(OLD.LOG_DELETE IS NULL, '"",', '"' || OLD.LOG_DELETE || '",');            
+                    IF (((OLD.SAVE_ID_DELETE IS NULL) AND (NEW.SAVE_ID_DELETE IS NOT NULL)) OR ((OLD.SAVE_ID_DELETE IS NOT NULL) AND (NEW.SAVE_ID_DELETE IS NULL)) OR (OLD.SAVE_ID_DELETE <> NEW.SAVE_ID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"SAVE_ID_DELETE": ' || IIF(OLD.SAVE_ID_DELETE IS NULL, '"",', '"' || OLD.SAVE_ID_DELETE || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTARCHI', OLD.ID_ASTARCHI, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2443,18 +2318,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTARCHI"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -2528,42 +2391,39 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTCONTA' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTCONTA', OLD.ID_ASTCONTA, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTCONTA' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTCONTA', OLD.ID_ASTCONTA, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTCONTA IS NULL, 0, OLD.ID_ASTCONTA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA": ' || OLD.ID_ASTCONTA || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (IIF(OLD.ID_ASTUSUAR IS NULL, 0, OLD.ID_ASTUSUAR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || OLD.ID_ASTUSUAR || ',';                            
-                IF (IIF(OLD.ID_ASTGRCON IS NULL, 0, OLD.ID_ASTGRCON) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || OLD.ID_ASTGRCON || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.NOME_CONTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_CONTA": ' || '"' || OLD.NOME_CONTA || '",';                            
-                IF (OLD.CURRENT_ACCOUNT IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CURRENT_ACCOUNT": ' || '"' || OLD.CURRENT_ACCOUNT || '",';                            
-                IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTCONTA IS NULL, 0, OLD.ID_ASTCONTA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA": ' || OLD.ID_ASTCONTA || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (IIF(OLD.ID_ASTUSUAR IS NULL, 0, OLD.ID_ASTUSUAR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || OLD.ID_ASTUSUAR || ',';                            
+                    IF (IIF(OLD.ID_ASTGRCON IS NULL, 0, OLD.ID_ASTGRCON) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || OLD.ID_ASTGRCON || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.NOME_CONTA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_CONTA": ' || '"' || OLD.NOME_CONTA || '",';                            
+                    IF (OLD.CURRENT_ACCOUNT IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CURRENT_ACCOUNT": ' || '"' || OLD.CURRENT_ACCOUNT || '",';                            
+                    IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2587,38 +2447,36 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTCONTA' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTCONTA' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTCONTA IS NULL) AND (NEW.ID_ASTCONTA IS NOT NULL)) OR ((OLD.ID_ASTCONTA IS NOT NULL) AND (NEW.ID_ASTCONTA IS NULL)) OR (OLD.ID_ASTCONTA <> NEW.ID_ASTCONTA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA": ' || IIF(OLD.ID_ASTCONTA IS NULL, 'NULL,', OLD.ID_ASTCONTA || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');                
-                IF (((OLD.ID_ASTUSUAR IS NULL) AND (NEW.ID_ASTUSUAR IS NOT NULL)) OR ((OLD.ID_ASTUSUAR IS NOT NULL) AND (NEW.ID_ASTUSUAR IS NULL)) OR (OLD.ID_ASTUSUAR <> NEW.ID_ASTUSUAR)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || IIF(OLD.ID_ASTUSUAR IS NULL, 'NULL,', OLD.ID_ASTUSUAR || ',');                
-                IF (((OLD.ID_ASTGRCON IS NULL) AND (NEW.ID_ASTGRCON IS NOT NULL)) OR ((OLD.ID_ASTGRCON IS NOT NULL) AND (NEW.ID_ASTGRCON IS NULL)) OR (OLD.ID_ASTGRCON <> NEW.ID_ASTGRCON)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || IIF(OLD.ID_ASTGRCON IS NULL, 'NULL,', OLD.ID_ASTGRCON || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.NOME_CONTA IS NULL) AND (NEW.NOME_CONTA IS NOT NULL)) OR ((OLD.NOME_CONTA IS NOT NULL) AND (NEW.NOME_CONTA IS NULL)) OR (OLD.NOME_CONTA <> NEW.NOME_CONTA)) THEN DESC_LOG = :DESC_LOG || '"NOME_CONTA": ' || IIF(OLD.NOME_CONTA IS NULL, '"",', '"' || OLD.NOME_CONTA || '",');            
-                IF (((OLD.CURRENT_ACCOUNT IS NULL) AND (NEW.CURRENT_ACCOUNT IS NOT NULL)) OR ((OLD.CURRENT_ACCOUNT IS NOT NULL) AND (NEW.CURRENT_ACCOUNT IS NULL)) OR (OLD.CURRENT_ACCOUNT <> NEW.CURRENT_ACCOUNT)) THEN DESC_LOG = :DESC_LOG || '"CURRENT_ACCOUNT": ' || IIF(OLD.CURRENT_ACCOUNT IS NULL, '"",', '"' || OLD.CURRENT_ACCOUNT || '",');            
-                IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTCONTA IS NULL) AND (NEW.ID_ASTCONTA IS NOT NULL)) OR ((OLD.ID_ASTCONTA IS NOT NULL) AND (NEW.ID_ASTCONTA IS NULL)) OR (OLD.ID_ASTCONTA <> NEW.ID_ASTCONTA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA": ' || IIF(OLD.ID_ASTCONTA IS NULL, 'NULL,', OLD.ID_ASTCONTA || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');                
+                    IF (((OLD.ID_ASTUSUAR IS NULL) AND (NEW.ID_ASTUSUAR IS NOT NULL)) OR ((OLD.ID_ASTUSUAR IS NOT NULL) AND (NEW.ID_ASTUSUAR IS NULL)) OR (OLD.ID_ASTUSUAR <> NEW.ID_ASTUSUAR)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || IIF(OLD.ID_ASTUSUAR IS NULL, 'NULL,', OLD.ID_ASTUSUAR || ',');                
+                    IF (((OLD.ID_ASTGRCON IS NULL) AND (NEW.ID_ASTGRCON IS NOT NULL)) OR ((OLD.ID_ASTGRCON IS NOT NULL) AND (NEW.ID_ASTGRCON IS NULL)) OR (OLD.ID_ASTGRCON <> NEW.ID_ASTGRCON)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || IIF(OLD.ID_ASTGRCON IS NULL, 'NULL,', OLD.ID_ASTGRCON || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.NOME_CONTA IS NULL) AND (NEW.NOME_CONTA IS NOT NULL)) OR ((OLD.NOME_CONTA IS NOT NULL) AND (NEW.NOME_CONTA IS NULL)) OR (OLD.NOME_CONTA <> NEW.NOME_CONTA)) THEN DESC_LOG = :DESC_LOG || '"NOME_CONTA": ' || IIF(OLD.NOME_CONTA IS NULL, '"",', '"' || OLD.NOME_CONTA || '",');            
+                    IF (((OLD.CURRENT_ACCOUNT IS NULL) AND (NEW.CURRENT_ACCOUNT IS NOT NULL)) OR ((OLD.CURRENT_ACCOUNT IS NOT NULL) AND (NEW.CURRENT_ACCOUNT IS NULL)) OR (OLD.CURRENT_ACCOUNT <> NEW.CURRENT_ACCOUNT)) THEN DESC_LOG = :DESC_LOG || '"CURRENT_ACCOUNT": ' || IIF(OLD.CURRENT_ACCOUNT IS NULL, '"",', '"' || OLD.CURRENT_ACCOUNT || '",');            
+                    IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTCONTA', OLD.ID_ASTCONTA, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2634,42 +2492,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTCONTA"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
-    /*  NA TEBELA "ASTUSUAR" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTCONTA"  */
-    IF (NEW.ID_ASTUSUAR IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTUSUAR
-            WHERE ASTUSUAR.ID_ASTUSUAR = NEW.ID_ASTUSUAR
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTUSUAR || ' na tabela ASTUSUAR .');
-       END
-    END
-    /*  NA TEBELA "ASTGRCON" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTCONTA"  */
-    IF (NEW.ID_ASTGRCON IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTGRCON
-            WHERE ASTGRCON.ID_ASTGRCON = NEW.ID_ASTGRCON
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTGRCON || ' na tabela ASTGRCON .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -2743,42 +2565,39 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTEMPRE' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTEMPRE', OLD.ID_ASTEMPRE, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTEMPRE' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTEMPRE', OLD.ID_ASTEMPRE, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.NOME_EMPRESA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_EMPRESA": ' || '"' || OLD.NOME_EMPRESA || '",';                            
-                IF (OLD.DOMINIO_EMPRESA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DOMINIO_EMPRESA": ' || '"' || OLD.DOMINIO_EMPRESA || '",';                            
-                IF (OLD.CAMINHO_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS": ' || '"' || OLD.CAMINHO_BANCO_DADOS || '",';                            
-                IF (OLD.NOME_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS": ' || '"' || OLD.NOME_BANCO_DADOS || '",';                            
-                IF (OLD.SENHA_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SENHA_BANCO_DADOS": ' || '"' || OLD.SENHA_BANCO_DADOS || '",';                            
-                IF (OLD.USUARIO_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USUARIO_BANCO_DADOS": ' || '"' || OLD.USUARIO_BANCO_DADOS || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.NOME_EMPRESA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_EMPRESA": ' || '"' || OLD.NOME_EMPRESA || '",';                            
+                    IF (OLD.DOMINIO_EMPRESA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DOMINIO_EMPRESA": ' || '"' || OLD.DOMINIO_EMPRESA || '",';                            
+                    IF (OLD.CAMINHO_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS": ' || '"' || OLD.CAMINHO_BANCO_DADOS || '",';                            
+                    IF (OLD.NOME_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS": ' || '"' || OLD.NOME_BANCO_DADOS || '",';                            
+                    IF (OLD.SENHA_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SENHA_BANCO_DADOS": ' || '"' || OLD.SENHA_BANCO_DADOS || '",';                            
+                    IF (OLD.USUARIO_BANCO_DADOS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USUARIO_BANCO_DADOS": ' || '"' || OLD.USUARIO_BANCO_DADOS || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -2802,38 +2621,36 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTEMPRE' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTEMPRE' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.NOME_EMPRESA IS NULL) AND (NEW.NOME_EMPRESA IS NOT NULL)) OR ((OLD.NOME_EMPRESA IS NOT NULL) AND (NEW.NOME_EMPRESA IS NULL)) OR (OLD.NOME_EMPRESA <> NEW.NOME_EMPRESA)) THEN DESC_LOG = :DESC_LOG || '"NOME_EMPRESA": ' || IIF(OLD.NOME_EMPRESA IS NULL, '"",', '"' || OLD.NOME_EMPRESA || '",');            
-                IF (((OLD.DOMINIO_EMPRESA IS NULL) AND (NEW.DOMINIO_EMPRESA IS NOT NULL)) OR ((OLD.DOMINIO_EMPRESA IS NOT NULL) AND (NEW.DOMINIO_EMPRESA IS NULL)) OR (OLD.DOMINIO_EMPRESA <> NEW.DOMINIO_EMPRESA)) THEN DESC_LOG = :DESC_LOG || '"DOMINIO_EMPRESA": ' || IIF(OLD.DOMINIO_EMPRESA IS NULL, '"",', '"' || OLD.DOMINIO_EMPRESA || '",');            
-                IF (((OLD.CAMINHO_BANCO_DADOS IS NULL) AND (NEW.CAMINHO_BANCO_DADOS IS NOT NULL)) OR ((OLD.CAMINHO_BANCO_DADOS IS NOT NULL) AND (NEW.CAMINHO_BANCO_DADOS IS NULL)) OR (OLD.CAMINHO_BANCO_DADOS <> NEW.CAMINHO_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS": ' || IIF(OLD.CAMINHO_BANCO_DADOS IS NULL, '"",', '"' || OLD.CAMINHO_BANCO_DADOS || '",');            
-                IF (((OLD.NOME_BANCO_DADOS IS NULL) AND (NEW.NOME_BANCO_DADOS IS NOT NULL)) OR ((OLD.NOME_BANCO_DADOS IS NOT NULL) AND (NEW.NOME_BANCO_DADOS IS NULL)) OR (OLD.NOME_BANCO_DADOS <> NEW.NOME_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS": ' || IIF(OLD.NOME_BANCO_DADOS IS NULL, '"",', '"' || OLD.NOME_BANCO_DADOS || '",');            
-                IF (((OLD.SENHA_BANCO_DADOS IS NULL) AND (NEW.SENHA_BANCO_DADOS IS NOT NULL)) OR ((OLD.SENHA_BANCO_DADOS IS NOT NULL) AND (NEW.SENHA_BANCO_DADOS IS NULL)) OR (OLD.SENHA_BANCO_DADOS <> NEW.SENHA_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"SENHA_BANCO_DADOS": ' || IIF(OLD.SENHA_BANCO_DADOS IS NULL, '"",', '"' || OLD.SENHA_BANCO_DADOS || '",');            
-                IF (((OLD.USUARIO_BANCO_DADOS IS NULL) AND (NEW.USUARIO_BANCO_DADOS IS NOT NULL)) OR ((OLD.USUARIO_BANCO_DADOS IS NOT NULL) AND (NEW.USUARIO_BANCO_DADOS IS NULL)) OR (OLD.USUARIO_BANCO_DADOS <> NEW.USUARIO_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"USUARIO_BANCO_DADOS": ' || IIF(OLD.USUARIO_BANCO_DADOS IS NULL, '"",', '"' || OLD.USUARIO_BANCO_DADOS || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.NOME_EMPRESA IS NULL) AND (NEW.NOME_EMPRESA IS NOT NULL)) OR ((OLD.NOME_EMPRESA IS NOT NULL) AND (NEW.NOME_EMPRESA IS NULL)) OR (OLD.NOME_EMPRESA <> NEW.NOME_EMPRESA)) THEN DESC_LOG = :DESC_LOG || '"NOME_EMPRESA": ' || IIF(OLD.NOME_EMPRESA IS NULL, '"",', '"' || OLD.NOME_EMPRESA || '",');            
+                    IF (((OLD.DOMINIO_EMPRESA IS NULL) AND (NEW.DOMINIO_EMPRESA IS NOT NULL)) OR ((OLD.DOMINIO_EMPRESA IS NOT NULL) AND (NEW.DOMINIO_EMPRESA IS NULL)) OR (OLD.DOMINIO_EMPRESA <> NEW.DOMINIO_EMPRESA)) THEN DESC_LOG = :DESC_LOG || '"DOMINIO_EMPRESA": ' || IIF(OLD.DOMINIO_EMPRESA IS NULL, '"",', '"' || OLD.DOMINIO_EMPRESA || '",');            
+                    IF (((OLD.CAMINHO_BANCO_DADOS IS NULL) AND (NEW.CAMINHO_BANCO_DADOS IS NOT NULL)) OR ((OLD.CAMINHO_BANCO_DADOS IS NOT NULL) AND (NEW.CAMINHO_BANCO_DADOS IS NULL)) OR (OLD.CAMINHO_BANCO_DADOS <> NEW.CAMINHO_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS": ' || IIF(OLD.CAMINHO_BANCO_DADOS IS NULL, '"",', '"' || OLD.CAMINHO_BANCO_DADOS || '",');            
+                    IF (((OLD.NOME_BANCO_DADOS IS NULL) AND (NEW.NOME_BANCO_DADOS IS NOT NULL)) OR ((OLD.NOME_BANCO_DADOS IS NOT NULL) AND (NEW.NOME_BANCO_DADOS IS NULL)) OR (OLD.NOME_BANCO_DADOS <> NEW.NOME_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS": ' || IIF(OLD.NOME_BANCO_DADOS IS NULL, '"",', '"' || OLD.NOME_BANCO_DADOS || '",');            
+                    IF (((OLD.SENHA_BANCO_DADOS IS NULL) AND (NEW.SENHA_BANCO_DADOS IS NOT NULL)) OR ((OLD.SENHA_BANCO_DADOS IS NOT NULL) AND (NEW.SENHA_BANCO_DADOS IS NULL)) OR (OLD.SENHA_BANCO_DADOS <> NEW.SENHA_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"SENHA_BANCO_DADOS": ' || IIF(OLD.SENHA_BANCO_DADOS IS NULL, '"",', '"' || OLD.SENHA_BANCO_DADOS || '",');            
+                    IF (((OLD.USUARIO_BANCO_DADOS IS NULL) AND (NEW.USUARIO_BANCO_DADOS IS NOT NULL)) OR ((OLD.USUARIO_BANCO_DADOS IS NOT NULL) AND (NEW.USUARIO_BANCO_DADOS IS NULL)) OR (OLD.USUARIO_BANCO_DADOS <> NEW.USUARIO_BANCO_DADOS)) THEN DESC_LOG = :DESC_LOG || '"USUARIO_BANCO_DADOS": ' || IIF(OLD.USUARIO_BANCO_DADOS IS NULL, '"",', '"' || OLD.USUARIO_BANCO_DADOS || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTEMPRE', OLD.ID_ASTEMPRE, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3112,42 +2929,39 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTFILIA' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTFILIA', OLD.ID_ASTFILIA, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTFILIA' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTFILIA', OLD.ID_ASTFILIA, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTFILIA IS NULL, 0, OLD.ID_ASTFILIA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || OLD.ID_ASTFILIA || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.CPF_CNPJ IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || '"' || OLD.CPF_CNPJ || '",';                            
-                IF (OLD.NOME_RAZAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || '"' || OLD.NOME_RAZAO || '",';                            
-                IF (OLD.APELIDO_FANTASIA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || '"' || OLD.APELIDO_FANTASIA || '",';                            
-                IF (OLD.CAMINHO_BANCO_DADOS_LOG IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS_LOG": ' || '"' || OLD.CAMINHO_BANCO_DADOS_LOG || '",';                            
-                IF (OLD.NOME_BANCO_DADOS_LOG IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS_LOG": ' || '"' || OLD.NOME_BANCO_DADOS_LOG || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTFILIA IS NULL, 0, OLD.ID_ASTFILIA) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || OLD.ID_ASTFILIA || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.CPF_CNPJ IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || '"' || OLD.CPF_CNPJ || '",';                            
+                    IF (OLD.NOME_RAZAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || '"' || OLD.NOME_RAZAO || '",';                            
+                    IF (OLD.APELIDO_FANTASIA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || '"' || OLD.APELIDO_FANTASIA || '",';                            
+                    IF (OLD.CAMINHO_BANCO_DADOS_LOG IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS_LOG": ' || '"' || OLD.CAMINHO_BANCO_DADOS_LOG || '",';                            
+                    IF (OLD.NOME_BANCO_DADOS_LOG IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS_LOG": ' || '"' || OLD.NOME_BANCO_DADOS_LOG || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3171,38 +2985,36 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTFILIA' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTFILIA' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTFILIA IS NULL) AND (NEW.ID_ASTFILIA IS NOT NULL)) OR ((OLD.ID_ASTFILIA IS NOT NULL) AND (NEW.ID_ASTFILIA IS NULL)) OR (OLD.ID_ASTFILIA <> NEW.ID_ASTFILIA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || IIF(OLD.ID_ASTFILIA IS NULL, 'NULL,', OLD.ID_ASTFILIA || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.CPF_CNPJ IS NULL) AND (NEW.CPF_CNPJ IS NOT NULL)) OR ((OLD.CPF_CNPJ IS NOT NULL) AND (NEW.CPF_CNPJ IS NULL)) OR (OLD.CPF_CNPJ <> NEW.CPF_CNPJ)) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || IIF(OLD.CPF_CNPJ IS NULL, '"",', '"' || OLD.CPF_CNPJ || '",');            
-                IF (((OLD.NOME_RAZAO IS NULL) AND (NEW.NOME_RAZAO IS NOT NULL)) OR ((OLD.NOME_RAZAO IS NOT NULL) AND (NEW.NOME_RAZAO IS NULL)) OR (OLD.NOME_RAZAO <> NEW.NOME_RAZAO)) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || IIF(OLD.NOME_RAZAO IS NULL, '"",', '"' || OLD.NOME_RAZAO || '",');            
-                IF (((OLD.APELIDO_FANTASIA IS NULL) AND (NEW.APELIDO_FANTASIA IS NOT NULL)) OR ((OLD.APELIDO_FANTASIA IS NOT NULL) AND (NEW.APELIDO_FANTASIA IS NULL)) OR (OLD.APELIDO_FANTASIA <> NEW.APELIDO_FANTASIA)) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || IIF(OLD.APELIDO_FANTASIA IS NULL, '"",', '"' || OLD.APELIDO_FANTASIA || '",');            
-                IF (((OLD.CAMINHO_BANCO_DADOS_LOG IS NULL) AND (NEW.CAMINHO_BANCO_DADOS_LOG IS NOT NULL)) OR ((OLD.CAMINHO_BANCO_DADOS_LOG IS NOT NULL) AND (NEW.CAMINHO_BANCO_DADOS_LOG IS NULL)) OR (OLD.CAMINHO_BANCO_DADOS_LOG <> NEW.CAMINHO_BANCO_DADOS_LOG)) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS_LOG": ' || IIF(OLD.CAMINHO_BANCO_DADOS_LOG IS NULL, '"",', '"' || OLD.CAMINHO_BANCO_DADOS_LOG || '",');            
-                IF (((OLD.NOME_BANCO_DADOS_LOG IS NULL) AND (NEW.NOME_BANCO_DADOS_LOG IS NOT NULL)) OR ((OLD.NOME_BANCO_DADOS_LOG IS NOT NULL) AND (NEW.NOME_BANCO_DADOS_LOG IS NULL)) OR (OLD.NOME_BANCO_DADOS_LOG <> NEW.NOME_BANCO_DADOS_LOG)) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS_LOG": ' || IIF(OLD.NOME_BANCO_DADOS_LOG IS NULL, '"",', '"' || OLD.NOME_BANCO_DADOS_LOG || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTFILIA IS NULL) AND (NEW.ID_ASTFILIA IS NOT NULL)) OR ((OLD.ID_ASTFILIA IS NOT NULL) AND (NEW.ID_ASTFILIA IS NULL)) OR (OLD.ID_ASTFILIA <> NEW.ID_ASTFILIA)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTFILIA": ' || IIF(OLD.ID_ASTFILIA IS NULL, 'NULL,', OLD.ID_ASTFILIA || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.CPF_CNPJ IS NULL) AND (NEW.CPF_CNPJ IS NOT NULL)) OR ((OLD.CPF_CNPJ IS NOT NULL) AND (NEW.CPF_CNPJ IS NULL)) OR (OLD.CPF_CNPJ <> NEW.CPF_CNPJ)) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || IIF(OLD.CPF_CNPJ IS NULL, '"",', '"' || OLD.CPF_CNPJ || '",');            
+                    IF (((OLD.NOME_RAZAO IS NULL) AND (NEW.NOME_RAZAO IS NOT NULL)) OR ((OLD.NOME_RAZAO IS NOT NULL) AND (NEW.NOME_RAZAO IS NULL)) OR (OLD.NOME_RAZAO <> NEW.NOME_RAZAO)) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || IIF(OLD.NOME_RAZAO IS NULL, '"",', '"' || OLD.NOME_RAZAO || '",');            
+                    IF (((OLD.APELIDO_FANTASIA IS NULL) AND (NEW.APELIDO_FANTASIA IS NOT NULL)) OR ((OLD.APELIDO_FANTASIA IS NOT NULL) AND (NEW.APELIDO_FANTASIA IS NULL)) OR (OLD.APELIDO_FANTASIA <> NEW.APELIDO_FANTASIA)) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || IIF(OLD.APELIDO_FANTASIA IS NULL, '"",', '"' || OLD.APELIDO_FANTASIA || '",');            
+                    IF (((OLD.CAMINHO_BANCO_DADOS_LOG IS NULL) AND (NEW.CAMINHO_BANCO_DADOS_LOG IS NOT NULL)) OR ((OLD.CAMINHO_BANCO_DADOS_LOG IS NOT NULL) AND (NEW.CAMINHO_BANCO_DADOS_LOG IS NULL)) OR (OLD.CAMINHO_BANCO_DADOS_LOG <> NEW.CAMINHO_BANCO_DADOS_LOG)) THEN DESC_LOG = :DESC_LOG || '"CAMINHO_BANCO_DADOS_LOG": ' || IIF(OLD.CAMINHO_BANCO_DADOS_LOG IS NULL, '"",', '"' || OLD.CAMINHO_BANCO_DADOS_LOG || '",');            
+                    IF (((OLD.NOME_BANCO_DADOS_LOG IS NULL) AND (NEW.NOME_BANCO_DADOS_LOG IS NOT NULL)) OR ((OLD.NOME_BANCO_DADOS_LOG IS NOT NULL) AND (NEW.NOME_BANCO_DADOS_LOG IS NULL)) OR (OLD.NOME_BANCO_DADOS_LOG <> NEW.NOME_BANCO_DADOS_LOG)) THEN DESC_LOG = :DESC_LOG || '"NOME_BANCO_DADOS_LOG": ' || IIF(OLD.NOME_BANCO_DADOS_LOG IS NULL, '"",', '"' || OLD.NOME_BANCO_DADOS_LOG || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTFILIA', OLD.ID_ASTFILIA, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3241,18 +3053,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTFILIA"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -3333,40 +3133,37 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTGRCON' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTGRCON', OLD.ID_ASTGRCON, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTGRCON' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTGRCON', OLD.ID_ASTGRCON, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTGRCON IS NULL, 0, OLD.ID_ASTGRCON) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || OLD.ID_ASTGRCON || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.DESCRICAO_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || '"' || OLD.DESCRICAO_GRUPO || '",';                            
-                IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
-                IF (OLD.ICONE_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ICONE_GRUPO": ' || '"' || OLD.ICONE_GRUPO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTGRCON IS NULL, 0, OLD.ID_ASTGRCON) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || OLD.ID_ASTGRCON || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.DESCRICAO_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || '"' || OLD.DESCRICAO_GRUPO || '",';                            
+                    IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
+                    IF (OLD.ICONE_GRUPO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ICONE_GRUPO": ' || '"' || OLD.ICONE_GRUPO || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3390,36 +3187,34 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTGRCON' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTGRCON' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTGRCON IS NULL) AND (NEW.ID_ASTGRCON IS NOT NULL)) OR ((OLD.ID_ASTGRCON IS NOT NULL) AND (NEW.ID_ASTGRCON IS NULL)) OR (OLD.ID_ASTGRCON <> NEW.ID_ASTGRCON)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || IIF(OLD.ID_ASTGRCON IS NULL, 'NULL,', OLD.ID_ASTGRCON || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.DESCRICAO_GRUPO IS NULL) AND (NEW.DESCRICAO_GRUPO IS NOT NULL)) OR ((OLD.DESCRICAO_GRUPO IS NOT NULL) AND (NEW.DESCRICAO_GRUPO IS NULL)) OR (OLD.DESCRICAO_GRUPO <> NEW.DESCRICAO_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || IIF(OLD.DESCRICAO_GRUPO IS NULL, '"",', '"' || OLD.DESCRICAO_GRUPO || '",');            
-                IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
-                IF (((OLD.ICONE_GRUPO IS NULL) AND (NEW.ICONE_GRUPO IS NOT NULL)) OR ((OLD.ICONE_GRUPO IS NOT NULL) AND (NEW.ICONE_GRUPO IS NULL)) OR (OLD.ICONE_GRUPO <> NEW.ICONE_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"ICONE_GRUPO": ' || IIF(OLD.ICONE_GRUPO IS NULL, '"",', '"' || OLD.ICONE_GRUPO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTGRCON IS NULL) AND (NEW.ID_ASTGRCON IS NOT NULL)) OR ((OLD.ID_ASTGRCON IS NOT NULL) AND (NEW.ID_ASTGRCON IS NULL)) OR (OLD.ID_ASTGRCON <> NEW.ID_ASTGRCON)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTGRCON": ' || IIF(OLD.ID_ASTGRCON IS NULL, 'NULL,', OLD.ID_ASTGRCON || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.DESCRICAO_GRUPO IS NULL) AND (NEW.DESCRICAO_GRUPO IS NOT NULL)) OR ((OLD.DESCRICAO_GRUPO IS NOT NULL) AND (NEW.DESCRICAO_GRUPO IS NULL)) OR (OLD.DESCRICAO_GRUPO <> NEW.DESCRICAO_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_GRUPO": ' || IIF(OLD.DESCRICAO_GRUPO IS NULL, '"",', '"' || OLD.DESCRICAO_GRUPO || '",');            
+                    IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
+                    IF (((OLD.ICONE_GRUPO IS NULL) AND (NEW.ICONE_GRUPO IS NOT NULL)) OR ((OLD.ICONE_GRUPO IS NOT NULL) AND (NEW.ICONE_GRUPO IS NULL)) OR (OLD.ICONE_GRUPO <> NEW.ICONE_GRUPO)) THEN DESC_LOG = :DESC_LOG || '"ICONE_GRUPO": ' || IIF(OLD.ICONE_GRUPO IS NULL, '"",', '"' || OLD.ICONE_GRUPO || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTGRCON', OLD.ID_ASTGRCON, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3458,18 +3253,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTGRCON"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -3550,43 +3333,9 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTLOGER' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTLOGER', OLD.ID_ASTLOGER, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
-                            
-                IF (IIF(OLD.ID_ASTLOGER IS NULL, 0, OLD.ID_ASTLOGER) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTLOGER": ' || OLD.ID_ASTLOGER || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.TIPO_OPERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"TIPO_OPERACAO": ' || '"' || OLD.TIPO_OPERACAO || '",';                            
-                IF (OLD.ARQUIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ARQUIVO": ' || '"' || OLD.ARQUIVO || '",';                            
-                IF (IIF(OLD.ID_REGISTRO IS NULL, 0, OLD.ID_REGISTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_REGISTRO": ' || OLD.ID_REGISTRO || ',';                            
-                IF (OLD.DT_OPERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_OPERACAO": ' || '"' || OLD.DT_OPERACAO || '",';                            
-                IF (OLD.DESCRICAO_LOG IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_LOG": ' || '"' || OLD.DESCRICAO_LOG || '",';                            
-                IF (OLD.ANEXO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ANEXO": ' || '"' || OLD.ANEXO || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+        /* É UMA TABELA DE LOG, POR ISSO NÃO VAI SER GERADO UMA TRIGGER IGUAL AS OUTRAS TABELAS */
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTLOGER', OLD.ID_ASTLOGER, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
-            INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTLOGER', OLD.ID_ASTLOGER, 'NOW', :DESC_LOG);
-
-    END
 END;^
 
 SET TERM ; ^;
@@ -3609,40 +3358,9 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTLOGER' INTO :LOG_UPD, :SAVE_ID_DEL;
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
-                        
-                IF (((OLD.ID_ASTLOGER IS NULL) AND (NEW.ID_ASTLOGER IS NOT NULL)) OR ((OLD.ID_ASTLOGER IS NOT NULL) AND (NEW.ID_ASTLOGER IS NULL)) OR (OLD.ID_ASTLOGER <> NEW.ID_ASTLOGER)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTLOGER": ' || IIF(OLD.ID_ASTLOGER IS NULL, 'NULL,', OLD.ID_ASTLOGER || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.TIPO_OPERACAO IS NULL) AND (NEW.TIPO_OPERACAO IS NOT NULL)) OR ((OLD.TIPO_OPERACAO IS NOT NULL) AND (NEW.TIPO_OPERACAO IS NULL)) OR (OLD.TIPO_OPERACAO <> NEW.TIPO_OPERACAO)) THEN DESC_LOG = :DESC_LOG || '"TIPO_OPERACAO": ' || IIF(OLD.TIPO_OPERACAO IS NULL, '"",', '"' || OLD.TIPO_OPERACAO || '",');            
-                IF (((OLD.ARQUIVO IS NULL) AND (NEW.ARQUIVO IS NOT NULL)) OR ((OLD.ARQUIVO IS NOT NULL) AND (NEW.ARQUIVO IS NULL)) OR (OLD.ARQUIVO <> NEW.ARQUIVO)) THEN DESC_LOG = :DESC_LOG || '"ARQUIVO": ' || IIF(OLD.ARQUIVO IS NULL, '"",', '"' || OLD.ARQUIVO || '",');                
-                IF (((OLD.ID_REGISTRO IS NULL) AND (NEW.ID_REGISTRO IS NOT NULL)) OR ((OLD.ID_REGISTRO IS NOT NULL) AND (NEW.ID_REGISTRO IS NULL)) OR (OLD.ID_REGISTRO <> NEW.ID_REGISTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_REGISTRO": ' || IIF(OLD.ID_REGISTRO IS NULL, 'NULL,', OLD.ID_REGISTRO || ',');            
-                IF (((OLD.DT_OPERACAO IS NULL) AND (NEW.DT_OPERACAO IS NOT NULL)) OR ((OLD.DT_OPERACAO IS NOT NULL) AND (NEW.DT_OPERACAO IS NULL)) OR (OLD.DT_OPERACAO <> NEW.DT_OPERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_OPERACAO": ' || IIF(OLD.DT_OPERACAO IS NULL, '"",', '"' || OLD.DT_OPERACAO || '",');            
-                IF (((OLD.DESCRICAO_LOG IS NULL) AND (NEW.DESCRICAO_LOG IS NOT NULL)) OR ((OLD.DESCRICAO_LOG IS NOT NULL) AND (NEW.DESCRICAO_LOG IS NULL)) OR (OLD.DESCRICAO_LOG <> NEW.DESCRICAO_LOG)) THEN DESC_LOG = :DESC_LOG || '"DESCRICAO_LOG": ' || IIF(OLD.DESCRICAO_LOG IS NULL, '"",', '"' || OLD.DESCRICAO_LOG || '",');            
-                IF (((OLD.ANEXO IS NULL) AND (NEW.ANEXO IS NOT NULL)) OR ((OLD.ANEXO IS NOT NULL) AND (NEW.ANEXO IS NULL)) OR (OLD.ANEXO <> NEW.ANEXO)) THEN DESC_LOG = :DESC_LOG || '"ANEXO": ' || IIF(OLD.ANEXO IS NULL, '"",', '"' || OLD.ANEXO || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTLOGER', OLD.ID_ASTLOGER, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
-            INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTLOGER', OLD.ID_ASTLOGER, 'NOW', :DESC_LOG);
-
-    END
+        /* É UMA TABELA DE LOG, POR ISSO NÃO VAI SER GERADO UMA TRIGGER IGUAL AS OUTRAS TABELAS */
+        
 END;^
 
 SET TERM ; ^;
@@ -3658,18 +3376,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTLOGER"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -3682,8 +3388,8 @@ BEGIN
             NEW.ID_ASTCONTA_CADASTRO = :ID_ASTACCOU_LOGIN;
     END        
 
-    /* COLUMN "ID_ASTLOGER" USES SEQUENCE GEN_ID_ASTLOGTA  */
-    IF( (NEW.ID_ASTLOGER IS NULL) OR (NEW.ID_ASTLOGER = 0) ) THEN NEW.ID_ASTLOGER = GEN_ID(GEN_ID_ASTLOGTA, 1);
+    /* COLUMN "ID_ASTLOGER" USES SEQUENCE GEN_ID_ASTLOGER  */
+    IF( (NEW.ID_ASTLOGER IS NULL) OR (NEW.ID_ASTLOGER = 0) ) THEN NEW.ID_ASTLOGER = GEN_ID(GEN_ID_ASTLOGER, 1);
     /* GERA O UUID */
     IF( (NEW.UUID IS NULL) OR (NEW.UUID = '') ) THEN NEW.UUID = (SELECT UUID_TO_CHAR(GEN_UUID()) FROM RDB$DATABASE);
     /* SALVA O USUARIO DE BANCO QUE ESTA FAZENDO A TRANSACAO */
@@ -3743,40 +3449,37 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTREGDE' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTREGDE', OLD.ID_ASTREGDE, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTREGDE' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTREGDE', OLD.ID_ASTREGDE, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTREGDE IS NULL, 0, OLD.ID_ASTREGDE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTREGDE": ' || OLD.ID_ASTREGDE || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.FILE_ARCHI IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"FILE_ARCHI": ' || '"' || OLD.FILE_ARCHI || '",';                            
-                IF (IIF(OLD.ID_DELETE IS NULL, 0, OLD.ID_DELETE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_DELETE": ' || OLD.ID_DELETE || ',';                            
-                IF (OLD.UUID_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID_DELETE": ' || '"' || OLD.UUID_DELETE || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTREGDE IS NULL, 0, OLD.ID_ASTREGDE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTREGDE": ' || OLD.ID_ASTREGDE || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.FILE_ARCHI IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"FILE_ARCHI": ' || '"' || OLD.FILE_ARCHI || '",';                            
+                    IF (IIF(OLD.ID_DELETE IS NULL, 0, OLD.ID_DELETE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_DELETE": ' || OLD.ID_DELETE || ',';                            
+                    IF (OLD.UUID_DELETE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID_DELETE": ' || '"' || OLD.UUID_DELETE || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3800,36 +3503,34 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTREGDE' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTREGDE' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTREGDE IS NULL) AND (NEW.ID_ASTREGDE IS NOT NULL)) OR ((OLD.ID_ASTREGDE IS NOT NULL) AND (NEW.ID_ASTREGDE IS NULL)) OR (OLD.ID_ASTREGDE <> NEW.ID_ASTREGDE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTREGDE": ' || IIF(OLD.ID_ASTREGDE IS NULL, 'NULL,', OLD.ID_ASTREGDE || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.FILE_ARCHI IS NULL) AND (NEW.FILE_ARCHI IS NOT NULL)) OR ((OLD.FILE_ARCHI IS NOT NULL) AND (NEW.FILE_ARCHI IS NULL)) OR (OLD.FILE_ARCHI <> NEW.FILE_ARCHI)) THEN DESC_LOG = :DESC_LOG || '"FILE_ARCHI": ' || IIF(OLD.FILE_ARCHI IS NULL, '"",', '"' || OLD.FILE_ARCHI || '",');                
-                IF (((OLD.ID_DELETE IS NULL) AND (NEW.ID_DELETE IS NOT NULL)) OR ((OLD.ID_DELETE IS NOT NULL) AND (NEW.ID_DELETE IS NULL)) OR (OLD.ID_DELETE <> NEW.ID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"ID_DELETE": ' || IIF(OLD.ID_DELETE IS NULL, 'NULL,', OLD.ID_DELETE || ',');            
-                IF (((OLD.UUID_DELETE IS NULL) AND (NEW.UUID_DELETE IS NOT NULL)) OR ((OLD.UUID_DELETE IS NOT NULL) AND (NEW.UUID_DELETE IS NULL)) OR (OLD.UUID_DELETE <> NEW.UUID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"UUID_DELETE": ' || IIF(OLD.UUID_DELETE IS NULL, '"",', '"' || OLD.UUID_DELETE || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTREGDE IS NULL) AND (NEW.ID_ASTREGDE IS NOT NULL)) OR ((OLD.ID_ASTREGDE IS NOT NULL) AND (NEW.ID_ASTREGDE IS NULL)) OR (OLD.ID_ASTREGDE <> NEW.ID_ASTREGDE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTREGDE": ' || IIF(OLD.ID_ASTREGDE IS NULL, 'NULL,', OLD.ID_ASTREGDE || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.FILE_ARCHI IS NULL) AND (NEW.FILE_ARCHI IS NOT NULL)) OR ((OLD.FILE_ARCHI IS NOT NULL) AND (NEW.FILE_ARCHI IS NULL)) OR (OLD.FILE_ARCHI <> NEW.FILE_ARCHI)) THEN DESC_LOG = :DESC_LOG || '"FILE_ARCHI": ' || IIF(OLD.FILE_ARCHI IS NULL, '"",', '"' || OLD.FILE_ARCHI || '",');                
+                    IF (((OLD.ID_DELETE IS NULL) AND (NEW.ID_DELETE IS NOT NULL)) OR ((OLD.ID_DELETE IS NOT NULL) AND (NEW.ID_DELETE IS NULL)) OR (OLD.ID_DELETE <> NEW.ID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"ID_DELETE": ' || IIF(OLD.ID_DELETE IS NULL, 'NULL,', OLD.ID_DELETE || ',');            
+                    IF (((OLD.UUID_DELETE IS NULL) AND (NEW.UUID_DELETE IS NOT NULL)) OR ((OLD.UUID_DELETE IS NOT NULL) AND (NEW.UUID_DELETE IS NULL)) OR (OLD.UUID_DELETE <> NEW.UUID_DELETE)) THEN DESC_LOG = :DESC_LOG || '"UUID_DELETE": ' || IIF(OLD.UUID_DELETE IS NULL, '"",', '"' || OLD.UUID_DELETE || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'ASTREGDE', OLD.ID_ASTREGDE, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3845,18 +3546,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTREGDE"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -3930,43 +3619,40 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTUSUAR' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTUSUAR', OLD.ID_ASTUSUAR, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTUSUAR' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('ASTUSUAR', OLD.ID_ASTUSUAR, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_ASTUSUAR IS NULL, 0, OLD.ID_ASTUSUAR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || OLD.ID_ASTUSUAR || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (OLD.NOME_USU IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_USU": ' || '"' || OLD.NOME_USU || '",';                            
-                IF (OLD.EMAIL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL": ' || '"' || OLD.EMAIL || '",';                            
-                IF (OLD.SENHA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SENHA": ' || '"' || OLD.SENHA || '",';                            
-                IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
-                IF (OLD.CHAVE_USU IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CHAVE_USU": ' || '"' || OLD.CHAVE_USU || '",';                            
-                IF (OLD.DDD_CELULAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DDD_CELULAR": ' || '"' || OLD.DDD_CELULAR || '",';                            
-                IF (OLD.NUMERO_CELULAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NUMERO_CELULAR": ' || '"' || OLD.NUMERO_CELULAR || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_ASTUSUAR IS NULL, 0, OLD.ID_ASTUSUAR) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || OLD.ID_ASTUSUAR || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (OLD.NOME_USU IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_USU": ' || '"' || OLD.NOME_USU || '",';                            
+                    IF (OLD.EMAIL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL": ' || '"' || OLD.EMAIL || '",';                            
+                    IF (OLD.SENHA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SENHA": ' || '"' || OLD.SENHA || '",';                            
+                    IF (OLD.ATIVO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || '"' || OLD.ATIVO || '",';                            
+                    IF (OLD.CHAVE_USU IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CHAVE_USU": ' || '"' || OLD.CHAVE_USU || '",';                            
+                    IF (OLD.DDD_CELULAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DDD_CELULAR": ' || '"' || OLD.DDD_CELULAR || '",';                            
+                    IF (OLD.NUMERO_CELULAR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NUMERO_CELULAR": ' || '"' || OLD.NUMERO_CELULAR || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, NULL, 'D', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  NULL, 'D', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  NULL, 'D', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -3990,39 +3676,37 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'ASTUSUAR' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'ASTUSUAR' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_ASTUSUAR IS NULL) AND (NEW.ID_ASTUSUAR IS NOT NULL)) OR ((OLD.ID_ASTUSUAR IS NOT NULL) AND (NEW.ID_ASTUSUAR IS NULL)) OR (OLD.ID_ASTUSUAR <> NEW.ID_ASTUSUAR)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || IIF(OLD.ID_ASTUSUAR IS NULL, 'NULL,', OLD.ID_ASTUSUAR || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
-                IF (((OLD.NOME_USU IS NULL) AND (NEW.NOME_USU IS NOT NULL)) OR ((OLD.NOME_USU IS NOT NULL) AND (NEW.NOME_USU IS NULL)) OR (OLD.NOME_USU <> NEW.NOME_USU)) THEN DESC_LOG = :DESC_LOG || '"NOME_USU": ' || IIF(OLD.NOME_USU IS NULL, '"",', '"' || OLD.NOME_USU || '",');            
-                IF (((OLD.EMAIL IS NULL) AND (NEW.EMAIL IS NOT NULL)) OR ((OLD.EMAIL IS NOT NULL) AND (NEW.EMAIL IS NULL)) OR (OLD.EMAIL <> NEW.EMAIL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL": ' || IIF(OLD.EMAIL IS NULL, '"",', '"' || OLD.EMAIL || '",');            
-                IF (((OLD.SENHA IS NULL) AND (NEW.SENHA IS NOT NULL)) OR ((OLD.SENHA IS NOT NULL) AND (NEW.SENHA IS NULL)) OR (OLD.SENHA <> NEW.SENHA)) THEN DESC_LOG = :DESC_LOG || '"SENHA": ' || IIF(OLD.SENHA IS NULL, '"",', '"' || OLD.SENHA || '",');            
-                IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
-                IF (((OLD.CHAVE_USU IS NULL) AND (NEW.CHAVE_USU IS NOT NULL)) OR ((OLD.CHAVE_USU IS NOT NULL) AND (NEW.CHAVE_USU IS NULL)) OR (OLD.CHAVE_USU <> NEW.CHAVE_USU)) THEN DESC_LOG = :DESC_LOG || '"CHAVE_USU": ' || IIF(OLD.CHAVE_USU IS NULL, '"",', '"' || OLD.CHAVE_USU || '",');            
-                IF (((OLD.DDD_CELULAR IS NULL) AND (NEW.DDD_CELULAR IS NOT NULL)) OR ((OLD.DDD_CELULAR IS NOT NULL) AND (NEW.DDD_CELULAR IS NULL)) OR (OLD.DDD_CELULAR <> NEW.DDD_CELULAR)) THEN DESC_LOG = :DESC_LOG || '"DDD_CELULAR": ' || IIF(OLD.DDD_CELULAR IS NULL, '"",', '"' || OLD.DDD_CELULAR || '",');            
-                IF (((OLD.NUMERO_CELULAR IS NULL) AND (NEW.NUMERO_CELULAR IS NOT NULL)) OR ((OLD.NUMERO_CELULAR IS NOT NULL) AND (NEW.NUMERO_CELULAR IS NULL)) OR (OLD.NUMERO_CELULAR <> NEW.NUMERO_CELULAR)) THEN DESC_LOG = :DESC_LOG || '"NUMERO_CELULAR": ' || IIF(OLD.NUMERO_CELULAR IS NULL, '"",', '"' || OLD.NUMERO_CELULAR || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_ASTUSUAR IS NULL) AND (NEW.ID_ASTUSUAR IS NOT NULL)) OR ((OLD.ID_ASTUSUAR IS NOT NULL) AND (NEW.ID_ASTUSUAR IS NULL)) OR (OLD.ID_ASTUSUAR <> NEW.ID_ASTUSUAR)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTUSUAR": ' || IIF(OLD.ID_ASTUSUAR IS NULL, 'NULL,', OLD.ID_ASTUSUAR || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');            
+                    IF (((OLD.NOME_USU IS NULL) AND (NEW.NOME_USU IS NOT NULL)) OR ((OLD.NOME_USU IS NOT NULL) AND (NEW.NOME_USU IS NULL)) OR (OLD.NOME_USU <> NEW.NOME_USU)) THEN DESC_LOG = :DESC_LOG || '"NOME_USU": ' || IIF(OLD.NOME_USU IS NULL, '"",', '"' || OLD.NOME_USU || '",');            
+                    IF (((OLD.EMAIL IS NULL) AND (NEW.EMAIL IS NOT NULL)) OR ((OLD.EMAIL IS NOT NULL) AND (NEW.EMAIL IS NULL)) OR (OLD.EMAIL <> NEW.EMAIL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL": ' || IIF(OLD.EMAIL IS NULL, '"",', '"' || OLD.EMAIL || '",');            
+                    IF (((OLD.SENHA IS NULL) AND (NEW.SENHA IS NOT NULL)) OR ((OLD.SENHA IS NOT NULL) AND (NEW.SENHA IS NULL)) OR (OLD.SENHA <> NEW.SENHA)) THEN DESC_LOG = :DESC_LOG || '"SENHA": ' || IIF(OLD.SENHA IS NULL, '"",', '"' || OLD.SENHA || '",');            
+                    IF (((OLD.ATIVO IS NULL) AND (NEW.ATIVO IS NOT NULL)) OR ((OLD.ATIVO IS NOT NULL) AND (NEW.ATIVO IS NULL)) OR (OLD.ATIVO <> NEW.ATIVO)) THEN DESC_LOG = :DESC_LOG || '"ATIVO": ' || IIF(OLD.ATIVO IS NULL, '"",', '"' || OLD.ATIVO || '",');            
+                    IF (((OLD.CHAVE_USU IS NULL) AND (NEW.CHAVE_USU IS NOT NULL)) OR ((OLD.CHAVE_USU IS NOT NULL) AND (NEW.CHAVE_USU IS NULL)) OR (OLD.CHAVE_USU <> NEW.CHAVE_USU)) THEN DESC_LOG = :DESC_LOG || '"CHAVE_USU": ' || IIF(OLD.CHAVE_USU IS NULL, '"",', '"' || OLD.CHAVE_USU || '",');            
+                    IF (((OLD.DDD_CELULAR IS NULL) AND (NEW.DDD_CELULAR IS NOT NULL)) OR ((OLD.DDD_CELULAR IS NOT NULL) AND (NEW.DDD_CELULAR IS NULL)) OR (OLD.DDD_CELULAR <> NEW.DDD_CELULAR)) THEN DESC_LOG = :DESC_LOG || '"DDD_CELULAR": ' || IIF(OLD.DDD_CELULAR IS NULL, '"",', '"' || OLD.DDD_CELULAR || '",');            
+                    IF (((OLD.NUMERO_CELULAR IS NULL) AND (NEW.NUMERO_CELULAR IS NOT NULL)) OR ((OLD.NUMERO_CELULAR IS NOT NULL) AND (NEW.NUMERO_CELULAR IS NULL)) OR (OLD.NUMERO_CELULAR <> NEW.NUMERO_CELULAR)) THEN DESC_LOG = :DESC_LOG || '"NUMERO_CELULAR": ' || IIF(OLD.NUMERO_CELULAR IS NULL, '"",', '"' || OLD.NUMERO_CELULAR || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  NULL, 'U', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  NULL, 'U', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  NULL, 'U', 'ASTUSUAR', OLD.ID_ASTUSUAR, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -4141,61 +3825,58 @@ BEGIN
     IF (RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN') IS NOT NULL) THEN 
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
-
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
-    SELECT LOG_DELETE, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'CFTPESSO' INTO :LOG_DEL, :SAVE_ID_DEL;
-    /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
-    IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('CFTPESSO', OLD.ID_CFTPESSO, OLD.UUID);
-
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
-    IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O ID DELETADO */
+        SELECT LOG_DELETE, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'CFTPESSO' INTO :LOG_DEL, :SAVE_ID_DEL;
+        /* SE ESSA TABELA ESTA MARCADA PARA SALVAR O ID DELACAO ENTÃO SALVA O ID EM UMA TABELA A PARTE PARA REPLICAR O ARQUIVO DELETADOS EM OUTROS BANCO DE DADOS QUE ESTAO REPLICADOS. */    
+        IF (IIF(:SAVE_ID_DEL IS NULL, '', :SAVE_ID_DEL) <> '0') THEN INSERT INTO ASTREGDE (FILE_ARCHI, ID_DELETE, UUID_DELETE) VALUES ('CFTPESSO', OLD.ID_CFTPESSO, OLD.UUID);
+        
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE DELETE DESSA TABELA. */
+        IF (IIF(:LOG_DEL IS NULL, '', :LOG_DEL) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
         
                             
-                IF (IIF(OLD.ID_CFTPESSO IS NULL, 0, OLD.ID_CFTPESSO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_CFTPESSO": ' || OLD.ID_CFTPESSO || ',';                            
-                IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
-                IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
-                IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
-                IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
-                IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
-                IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
-                IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
-                IF (IIF(OLD.CODIGO_CLIENTE IS NULL, 0, OLD.CODIGO_CLIENTE) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_CLIENTE": ' || OLD.CODIGO_CLIENTE || ',';                            
-                IF (IIF(OLD.CODIGO_FORNECEDOR IS NULL, 0, OLD.CODIGO_FORNECEDOR) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FORNECEDOR": ' || OLD.CODIGO_FORNECEDOR || ',';                            
-                IF (IIF(OLD.CODIGO_FUNCIONARIO IS NULL, 0, OLD.CODIGO_FUNCIONARIO) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FUNCIONARIO": ' || OLD.CODIGO_FUNCIONARIO || ',';                            
-                IF (IIF(OLD.CODIGO_USUARIO IS NULL, 0, OLD.CODIGO_USUARIO) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_USUARIO": ' || OLD.CODIGO_USUARIO || ',';                            
-                IF (IIF(OLD.CODIGO_TRANSPORTADORA IS NULL, 0, OLD.CODIGO_TRANSPORTADORA) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_TRANSPORTADORA": ' || OLD.CODIGO_TRANSPORTADORA || ',';                            
-                IF (IIF(OLD.CODIGO_REPRESENTANTE IS NULL, 0, OLD.CODIGO_REPRESENTANTE) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_REPRESENTANTE": ' || OLD.CODIGO_REPRESENTANTE || ',';                            
-                IF (OLD.IS_CLIENTE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_CLIENTE": ' || '"' || OLD.IS_CLIENTE || '",';                            
-                IF (OLD.IS_FORNECEDOR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_FORNECEDOR": ' || '"' || OLD.IS_FORNECEDOR || '",';                            
-                IF (OLD.IS_FUNCIONARIO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_FUNCIONARIO": ' || '"' || OLD.IS_FUNCIONARIO || '",';                            
-                IF (OLD.IS_USUARIO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_USUARIO": ' || '"' || OLD.IS_USUARIO || '",';                            
-                IF (OLD.IS_TRANSPORTADORA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_TRANSPORTADORA": ' || '"' || OLD.IS_TRANSPORTADORA || '",';                            
-                IF (OLD.IS_REPRESENTANTE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_REPRESENTANTE": ' || '"' || OLD.IS_REPRESENTANTE || '",';                            
-                IF (OLD.NOME_RAZAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || '"' || OLD.NOME_RAZAO || '",';                            
-                IF (OLD.APELIDO_FANTASIA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || '"' || OLD.APELIDO_FANTASIA || '",';                            
-                IF (OLD.CPF_CNPJ IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || '"' || OLD.CPF_CNPJ || '",';                            
-                IF (OLD.RG_IE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"RG_IE": ' || '"' || OLD.RG_IE || '",';                            
-                IF (OLD.INSC_MUNICIPAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"INSC_MUNICIPAL": ' || '"' || OLD.INSC_MUNICIPAL || '",';                            
-                IF (OLD.INSC_SUFRAMA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"INSC_SUFRAMA": ' || '"' || OLD.INSC_SUFRAMA || '",';                            
-                IF (OLD.OBS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"OBS": ' || '"' || OLD.OBS || '",';                            
-                IF (OLD.EMAIL_COMPRAS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_COMPRAS": ' || '"' || OLD.EMAIL_COMPRAS || '",';                            
-                IF (OLD.EMAIL_FISCAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FISCAL": ' || '"' || OLD.EMAIL_FISCAL || '",';                            
-                IF (OLD.EMAIL_FINANCEIRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FINANCEIRO": ' || '"' || OLD.EMAIL_FINANCEIRO || '",';                            
-                IF (OLD.EMAIL_GERAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_GERAL": ' || '"' || OLD.EMAIL_GERAL || '",';                            
-                IF (OLD.SITE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SITE": ' || '"' || OLD.SITE || '",';        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (IIF(OLD.ID_CFTPESSO IS NULL, 0, OLD.ID_CFTPESSO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_CFTPESSO": ' || OLD.ID_CFTPESSO || ',';                            
+                    IF (IIF(OLD.ID_ASTEMPRE IS NULL, 0, OLD.ID_ASTEMPRE) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || OLD.ID_ASTEMPRE || ',';                            
+                    IF (OLD.UUID IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || '"' || OLD.UUID || '",';                            
+                    IF (OLD.USU_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || '"' || OLD.USU_CADASTRO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 0, OLD.ID_ASTCONTA_CADASTRO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || OLD.ID_ASTCONTA_CADASTRO || ',';                            
+                    IF (OLD.DT_CADASTRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || '"' || OLD.DT_CADASTRO || '",';                            
+                    IF (OLD.USU_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || '"' || OLD.USU_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 0, OLD.ID_ASTCONTA_ALTERACAO) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || OLD.ID_ASTCONTA_ALTERACAO || ',';                            
+                    IF (OLD.DT_ALTERACAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || '"' || OLD.DT_ALTERACAO || '",';                            
+                    IF (IIF(OLD.ID_INTEGRATION IS NULL, 0, OLD.ID_INTEGRATION) <> 0) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || OLD.ID_INTEGRATION || ',';                            
+                    IF (IIF(OLD.CODIGO_CLIENTE IS NULL, 0, OLD.CODIGO_CLIENTE) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_CLIENTE": ' || OLD.CODIGO_CLIENTE || ',';                            
+                    IF (IIF(OLD.CODIGO_FORNECEDOR IS NULL, 0, OLD.CODIGO_FORNECEDOR) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FORNECEDOR": ' || OLD.CODIGO_FORNECEDOR || ',';                            
+                    IF (IIF(OLD.CODIGO_FUNCIONARIO IS NULL, 0, OLD.CODIGO_FUNCIONARIO) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FUNCIONARIO": ' || OLD.CODIGO_FUNCIONARIO || ',';                            
+                    IF (IIF(OLD.CODIGO_USUARIO IS NULL, 0, OLD.CODIGO_USUARIO) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_USUARIO": ' || OLD.CODIGO_USUARIO || ',';                            
+                    IF (IIF(OLD.CODIGO_TRANSPORTADORA IS NULL, 0, OLD.CODIGO_TRANSPORTADORA) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_TRANSPORTADORA": ' || OLD.CODIGO_TRANSPORTADORA || ',';                            
+                    IF (IIF(OLD.CODIGO_REPRESENTANTE IS NULL, 0, OLD.CODIGO_REPRESENTANTE) <> 0) THEN DESC_LOG = :DESC_LOG || '"CODIGO_REPRESENTANTE": ' || OLD.CODIGO_REPRESENTANTE || ',';                            
+                    IF (OLD.IS_CLIENTE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_CLIENTE": ' || '"' || OLD.IS_CLIENTE || '",';                            
+                    IF (OLD.IS_FORNECEDOR IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_FORNECEDOR": ' || '"' || OLD.IS_FORNECEDOR || '",';                            
+                    IF (OLD.IS_FUNCIONARIO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_FUNCIONARIO": ' || '"' || OLD.IS_FUNCIONARIO || '",';                            
+                    IF (OLD.IS_USUARIO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_USUARIO": ' || '"' || OLD.IS_USUARIO || '",';                            
+                    IF (OLD.IS_TRANSPORTADORA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_TRANSPORTADORA": ' || '"' || OLD.IS_TRANSPORTADORA || '",';                            
+                    IF (OLD.IS_REPRESENTANTE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"IS_REPRESENTANTE": ' || '"' || OLD.IS_REPRESENTANTE || '",';                            
+                    IF (OLD.NOME_RAZAO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || '"' || OLD.NOME_RAZAO || '",';                            
+                    IF (OLD.APELIDO_FANTASIA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || '"' || OLD.APELIDO_FANTASIA || '",';                            
+                    IF (OLD.CPF_CNPJ IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || '"' || OLD.CPF_CNPJ || '",';                            
+                    IF (OLD.RG_IE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"RG_IE": ' || '"' || OLD.RG_IE || '",';                            
+                    IF (OLD.INSC_MUNICIPAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"INSC_MUNICIPAL": ' || '"' || OLD.INSC_MUNICIPAL || '",';                            
+                    IF (OLD.INSC_SUFRAMA IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"INSC_SUFRAMA": ' || '"' || OLD.INSC_SUFRAMA || '",';                            
+                    IF (OLD.OBS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"OBS": ' || '"' || OLD.OBS || '",';                            
+                    IF (OLD.EMAIL_COMPRAS IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_COMPRAS": ' || '"' || OLD.EMAIL_COMPRAS || '",';                            
+                    IF (OLD.EMAIL_FISCAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FISCAL": ' || '"' || OLD.EMAIL_FISCAL || '",';                            
+                    IF (OLD.EMAIL_FINANCEIRO IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FINANCEIRO": ' || '"' || OLD.EMAIL_FINANCEIRO || '",';                            
+                    IF (OLD.EMAIL_GERAL IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"EMAIL_GERAL": ' || '"' || OLD.EMAIL_GERAL || '",';                            
+                    IF (OLD.SITE IS NOT NULL) THEN DESC_LOG = :DESC_LOG || '"SITE": ' || '"' || OLD.SITE || '",';        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN, OLD.ID_ASTEMPRE , 'D', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG);
+                VALUES (IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'D', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -4219,57 +3900,55 @@ BEGIN
         ID_ASTACCOU_LOGIN = RDB$GET_CONTEXT('USER_TRANSACTION', 'ID_ASTACCOU_LOGIN');
     ELSE ID_ASTACCOU_LOGIN = 0;
 
-    /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
-    SELECT LOG_ALTER, SAVE_ID_DELETE 
-        FROM ASTARCHI 
-        WHERE ASTARCHI.FILE =  'CFTPESSO' INTO :LOG_UPD, :SAVE_ID_DEL;
+        /* CHECA SE O ARQUIVO EH PRA SALVAR O LOG DE ALTERACAO DO REGISTRO */
+        SELECT LOG_ALTER, SAVE_ID_DELETE 
+            FROM ASTARCHI 
+            WHERE ASTARCHI.FILE =  'CFTPESSO' INTO :LOG_UPD, :SAVE_ID_DEL;
 
-    /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
-    IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
-        DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
+        /* VERIFICA SE NAO PRECISA GERAR O LOG DE UPDATE DESSA TABELA. */
+        IF (IIF(:LOG_UPD IS NULL, '', :LOG_UPD) <> '0') THEN BEGIN
+            DESC_LOG = '{'; -- INICIA A VARIAVEL QUE VAI SALVAR A DESCRICAO DO LOG NO FORMATO JSON
                         
-                IF (((OLD.ID_CFTPESSO IS NULL) AND (NEW.ID_CFTPESSO IS NOT NULL)) OR ((OLD.ID_CFTPESSO IS NOT NULL) AND (NEW.ID_CFTPESSO IS NULL)) OR (OLD.ID_CFTPESSO <> NEW.ID_CFTPESSO)) THEN DESC_LOG = :DESC_LOG || '"ID_CFTPESSO": ' || IIF(OLD.ID_CFTPESSO IS NULL, 'NULL,', OLD.ID_CFTPESSO || ',');                
-                IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
-                IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
-                IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
-                IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
-                IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
-                IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
-                IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
-                IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
-                IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');                
-                IF (((OLD.CODIGO_CLIENTE IS NULL) AND (NEW.CODIGO_CLIENTE IS NOT NULL)) OR ((OLD.CODIGO_CLIENTE IS NOT NULL) AND (NEW.CODIGO_CLIENTE IS NULL)) OR (OLD.CODIGO_CLIENTE <> NEW.CODIGO_CLIENTE)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_CLIENTE": ' || IIF(OLD.CODIGO_CLIENTE IS NULL, 'NULL,', OLD.CODIGO_CLIENTE || ',');                
-                IF (((OLD.CODIGO_FORNECEDOR IS NULL) AND (NEW.CODIGO_FORNECEDOR IS NOT NULL)) OR ((OLD.CODIGO_FORNECEDOR IS NOT NULL) AND (NEW.CODIGO_FORNECEDOR IS NULL)) OR (OLD.CODIGO_FORNECEDOR <> NEW.CODIGO_FORNECEDOR)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FORNECEDOR": ' || IIF(OLD.CODIGO_FORNECEDOR IS NULL, 'NULL,', OLD.CODIGO_FORNECEDOR || ',');                
-                IF (((OLD.CODIGO_FUNCIONARIO IS NULL) AND (NEW.CODIGO_FUNCIONARIO IS NOT NULL)) OR ((OLD.CODIGO_FUNCIONARIO IS NOT NULL) AND (NEW.CODIGO_FUNCIONARIO IS NULL)) OR (OLD.CODIGO_FUNCIONARIO <> NEW.CODIGO_FUNCIONARIO)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FUNCIONARIO": ' || IIF(OLD.CODIGO_FUNCIONARIO IS NULL, 'NULL,', OLD.CODIGO_FUNCIONARIO || ',');                
-                IF (((OLD.CODIGO_USUARIO IS NULL) AND (NEW.CODIGO_USUARIO IS NOT NULL)) OR ((OLD.CODIGO_USUARIO IS NOT NULL) AND (NEW.CODIGO_USUARIO IS NULL)) OR (OLD.CODIGO_USUARIO <> NEW.CODIGO_USUARIO)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_USUARIO": ' || IIF(OLD.CODIGO_USUARIO IS NULL, 'NULL,', OLD.CODIGO_USUARIO || ',');                
-                IF (((OLD.CODIGO_TRANSPORTADORA IS NULL) AND (NEW.CODIGO_TRANSPORTADORA IS NOT NULL)) OR ((OLD.CODIGO_TRANSPORTADORA IS NOT NULL) AND (NEW.CODIGO_TRANSPORTADORA IS NULL)) OR (OLD.CODIGO_TRANSPORTADORA <> NEW.CODIGO_TRANSPORTADORA)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_TRANSPORTADORA": ' || IIF(OLD.CODIGO_TRANSPORTADORA IS NULL, 'NULL,', OLD.CODIGO_TRANSPORTADORA || ',');                
-                IF (((OLD.CODIGO_REPRESENTANTE IS NULL) AND (NEW.CODIGO_REPRESENTANTE IS NOT NULL)) OR ((OLD.CODIGO_REPRESENTANTE IS NOT NULL) AND (NEW.CODIGO_REPRESENTANTE IS NULL)) OR (OLD.CODIGO_REPRESENTANTE <> NEW.CODIGO_REPRESENTANTE)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_REPRESENTANTE": ' || IIF(OLD.CODIGO_REPRESENTANTE IS NULL, 'NULL,', OLD.CODIGO_REPRESENTANTE || ',');            
-                IF (((OLD.IS_CLIENTE IS NULL) AND (NEW.IS_CLIENTE IS NOT NULL)) OR ((OLD.IS_CLIENTE IS NOT NULL) AND (NEW.IS_CLIENTE IS NULL)) OR (OLD.IS_CLIENTE <> NEW.IS_CLIENTE)) THEN DESC_LOG = :DESC_LOG || '"IS_CLIENTE": ' || IIF(OLD.IS_CLIENTE IS NULL, '"",', '"' || OLD.IS_CLIENTE || '",');            
-                IF (((OLD.IS_FORNECEDOR IS NULL) AND (NEW.IS_FORNECEDOR IS NOT NULL)) OR ((OLD.IS_FORNECEDOR IS NOT NULL) AND (NEW.IS_FORNECEDOR IS NULL)) OR (OLD.IS_FORNECEDOR <> NEW.IS_FORNECEDOR)) THEN DESC_LOG = :DESC_LOG || '"IS_FORNECEDOR": ' || IIF(OLD.IS_FORNECEDOR IS NULL, '"",', '"' || OLD.IS_FORNECEDOR || '",');            
-                IF (((OLD.IS_FUNCIONARIO IS NULL) AND (NEW.IS_FUNCIONARIO IS NOT NULL)) OR ((OLD.IS_FUNCIONARIO IS NOT NULL) AND (NEW.IS_FUNCIONARIO IS NULL)) OR (OLD.IS_FUNCIONARIO <> NEW.IS_FUNCIONARIO)) THEN DESC_LOG = :DESC_LOG || '"IS_FUNCIONARIO": ' || IIF(OLD.IS_FUNCIONARIO IS NULL, '"",', '"' || OLD.IS_FUNCIONARIO || '",');            
-                IF (((OLD.IS_USUARIO IS NULL) AND (NEW.IS_USUARIO IS NOT NULL)) OR ((OLD.IS_USUARIO IS NOT NULL) AND (NEW.IS_USUARIO IS NULL)) OR (OLD.IS_USUARIO <> NEW.IS_USUARIO)) THEN DESC_LOG = :DESC_LOG || '"IS_USUARIO": ' || IIF(OLD.IS_USUARIO IS NULL, '"",', '"' || OLD.IS_USUARIO || '",');            
-                IF (((OLD.IS_TRANSPORTADORA IS NULL) AND (NEW.IS_TRANSPORTADORA IS NOT NULL)) OR ((OLD.IS_TRANSPORTADORA IS NOT NULL) AND (NEW.IS_TRANSPORTADORA IS NULL)) OR (OLD.IS_TRANSPORTADORA <> NEW.IS_TRANSPORTADORA)) THEN DESC_LOG = :DESC_LOG || '"IS_TRANSPORTADORA": ' || IIF(OLD.IS_TRANSPORTADORA IS NULL, '"",', '"' || OLD.IS_TRANSPORTADORA || '",');            
-                IF (((OLD.IS_REPRESENTANTE IS NULL) AND (NEW.IS_REPRESENTANTE IS NOT NULL)) OR ((OLD.IS_REPRESENTANTE IS NOT NULL) AND (NEW.IS_REPRESENTANTE IS NULL)) OR (OLD.IS_REPRESENTANTE <> NEW.IS_REPRESENTANTE)) THEN DESC_LOG = :DESC_LOG || '"IS_REPRESENTANTE": ' || IIF(OLD.IS_REPRESENTANTE IS NULL, '"",', '"' || OLD.IS_REPRESENTANTE || '",');            
-                IF (((OLD.NOME_RAZAO IS NULL) AND (NEW.NOME_RAZAO IS NOT NULL)) OR ((OLD.NOME_RAZAO IS NOT NULL) AND (NEW.NOME_RAZAO IS NULL)) OR (OLD.NOME_RAZAO <> NEW.NOME_RAZAO)) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || IIF(OLD.NOME_RAZAO IS NULL, '"",', '"' || OLD.NOME_RAZAO || '",');            
-                IF (((OLD.APELIDO_FANTASIA IS NULL) AND (NEW.APELIDO_FANTASIA IS NOT NULL)) OR ((OLD.APELIDO_FANTASIA IS NOT NULL) AND (NEW.APELIDO_FANTASIA IS NULL)) OR (OLD.APELIDO_FANTASIA <> NEW.APELIDO_FANTASIA)) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || IIF(OLD.APELIDO_FANTASIA IS NULL, '"",', '"' || OLD.APELIDO_FANTASIA || '",');            
-                IF (((OLD.CPF_CNPJ IS NULL) AND (NEW.CPF_CNPJ IS NOT NULL)) OR ((OLD.CPF_CNPJ IS NOT NULL) AND (NEW.CPF_CNPJ IS NULL)) OR (OLD.CPF_CNPJ <> NEW.CPF_CNPJ)) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || IIF(OLD.CPF_CNPJ IS NULL, '"",', '"' || OLD.CPF_CNPJ || '",');            
-                IF (((OLD.RG_IE IS NULL) AND (NEW.RG_IE IS NOT NULL)) OR ((OLD.RG_IE IS NOT NULL) AND (NEW.RG_IE IS NULL)) OR (OLD.RG_IE <> NEW.RG_IE)) THEN DESC_LOG = :DESC_LOG || '"RG_IE": ' || IIF(OLD.RG_IE IS NULL, '"",', '"' || OLD.RG_IE || '",');            
-                IF (((OLD.INSC_MUNICIPAL IS NULL) AND (NEW.INSC_MUNICIPAL IS NOT NULL)) OR ((OLD.INSC_MUNICIPAL IS NOT NULL) AND (NEW.INSC_MUNICIPAL IS NULL)) OR (OLD.INSC_MUNICIPAL <> NEW.INSC_MUNICIPAL)) THEN DESC_LOG = :DESC_LOG || '"INSC_MUNICIPAL": ' || IIF(OLD.INSC_MUNICIPAL IS NULL, '"",', '"' || OLD.INSC_MUNICIPAL || '",');            
-                IF (((OLD.INSC_SUFRAMA IS NULL) AND (NEW.INSC_SUFRAMA IS NOT NULL)) OR ((OLD.INSC_SUFRAMA IS NOT NULL) AND (NEW.INSC_SUFRAMA IS NULL)) OR (OLD.INSC_SUFRAMA <> NEW.INSC_SUFRAMA)) THEN DESC_LOG = :DESC_LOG || '"INSC_SUFRAMA": ' || IIF(OLD.INSC_SUFRAMA IS NULL, '"",', '"' || OLD.INSC_SUFRAMA || '",');            
-                IF (((OLD.OBS IS NULL) AND (NEW.OBS IS NOT NULL)) OR ((OLD.OBS IS NOT NULL) AND (NEW.OBS IS NULL)) OR (OLD.OBS <> NEW.OBS)) THEN DESC_LOG = :DESC_LOG || '"OBS": ' || IIF(OLD.OBS IS NULL, '"",', '"' || OLD.OBS || '",');            
-                IF (((OLD.EMAIL_COMPRAS IS NULL) AND (NEW.EMAIL_COMPRAS IS NOT NULL)) OR ((OLD.EMAIL_COMPRAS IS NOT NULL) AND (NEW.EMAIL_COMPRAS IS NULL)) OR (OLD.EMAIL_COMPRAS <> NEW.EMAIL_COMPRAS)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_COMPRAS": ' || IIF(OLD.EMAIL_COMPRAS IS NULL, '"",', '"' || OLD.EMAIL_COMPRAS || '",');            
-                IF (((OLD.EMAIL_FISCAL IS NULL) AND (NEW.EMAIL_FISCAL IS NOT NULL)) OR ((OLD.EMAIL_FISCAL IS NOT NULL) AND (NEW.EMAIL_FISCAL IS NULL)) OR (OLD.EMAIL_FISCAL <> NEW.EMAIL_FISCAL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FISCAL": ' || IIF(OLD.EMAIL_FISCAL IS NULL, '"",', '"' || OLD.EMAIL_FISCAL || '",');            
-                IF (((OLD.EMAIL_FINANCEIRO IS NULL) AND (NEW.EMAIL_FINANCEIRO IS NOT NULL)) OR ((OLD.EMAIL_FINANCEIRO IS NOT NULL) AND (NEW.EMAIL_FINANCEIRO IS NULL)) OR (OLD.EMAIL_FINANCEIRO <> NEW.EMAIL_FINANCEIRO)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FINANCEIRO": ' || IIF(OLD.EMAIL_FINANCEIRO IS NULL, '"",', '"' || OLD.EMAIL_FINANCEIRO || '",');            
-                IF (((OLD.EMAIL_GERAL IS NULL) AND (NEW.EMAIL_GERAL IS NOT NULL)) OR ((OLD.EMAIL_GERAL IS NOT NULL) AND (NEW.EMAIL_GERAL IS NULL)) OR (OLD.EMAIL_GERAL <> NEW.EMAIL_GERAL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_GERAL": ' || IIF(OLD.EMAIL_GERAL IS NULL, '"",', '"' || OLD.EMAIL_GERAL || '",');            
-                IF (((OLD.SITE IS NULL) AND (NEW.SITE IS NOT NULL)) OR ((OLD.SITE IS NOT NULL) AND (NEW.SITE IS NULL)) OR (OLD.SITE <> NEW.SITE)) THEN DESC_LOG = :DESC_LOG || '"SITE": ' || IIF(OLD.SITE IS NULL, '"",', '"' || OLD.SITE || '",');        
-        DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
+                    IF (((OLD.ID_CFTPESSO IS NULL) AND (NEW.ID_CFTPESSO IS NOT NULL)) OR ((OLD.ID_CFTPESSO IS NOT NULL) AND (NEW.ID_CFTPESSO IS NULL)) OR (OLD.ID_CFTPESSO <> NEW.ID_CFTPESSO)) THEN DESC_LOG = :DESC_LOG || '"ID_CFTPESSO": ' || IIF(OLD.ID_CFTPESSO IS NULL, 'NULL,', OLD.ID_CFTPESSO || ',');                
+                    IF (((OLD.ID_ASTEMPRE IS NULL) AND (NEW.ID_ASTEMPRE IS NOT NULL)) OR ((OLD.ID_ASTEMPRE IS NOT NULL) AND (NEW.ID_ASTEMPRE IS NULL)) OR (OLD.ID_ASTEMPRE <> NEW.ID_ASTEMPRE)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTEMPRE": ' || IIF(OLD.ID_ASTEMPRE IS NULL, 'NULL,', OLD.ID_ASTEMPRE || ',');            
+                    IF (((OLD.UUID IS NULL) AND (NEW.UUID IS NOT NULL)) OR ((OLD.UUID IS NOT NULL) AND (NEW.UUID IS NULL)) OR (OLD.UUID <> NEW.UUID)) THEN DESC_LOG = :DESC_LOG || '"UUID": ' || IIF(OLD.UUID IS NULL, '"",', '"' || OLD.UUID || '",');            
+                    IF (((OLD.USU_CADASTRO IS NULL) AND (NEW.USU_CADASTRO IS NOT NULL)) OR ((OLD.USU_CADASTRO IS NOT NULL) AND (NEW.USU_CADASTRO IS NULL)) OR (OLD.USU_CADASTRO <> NEW.USU_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"USU_CADASTRO": ' || IIF(OLD.USU_CADASTRO IS NULL, '"",', '"' || OLD.USU_CADASTRO || '",');                
+                    IF (((OLD.ID_ASTCONTA_CADASTRO IS NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_CADASTRO IS NOT NULL) AND (NEW.ID_ASTCONTA_CADASTRO IS NULL)) OR (OLD.ID_ASTCONTA_CADASTRO <> NEW.ID_ASTCONTA_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_CADASTRO": ' || IIF(OLD.ID_ASTCONTA_CADASTRO IS NULL, 'NULL,', OLD.ID_ASTCONTA_CADASTRO || ',');            
+                    IF (((OLD.DT_CADASTRO IS NULL) AND (NEW.DT_CADASTRO IS NOT NULL)) OR ((OLD.DT_CADASTRO IS NOT NULL) AND (NEW.DT_CADASTRO IS NULL)) OR (OLD.DT_CADASTRO <> NEW.DT_CADASTRO)) THEN DESC_LOG = :DESC_LOG || '"DT_CADASTRO": ' || IIF(OLD.DT_CADASTRO IS NULL, '"",', '"' || OLD.DT_CADASTRO || '",');            
+                    IF (((OLD.USU_ALTERACAO IS NULL) AND (NEW.USU_ALTERACAO IS NOT NULL)) OR ((OLD.USU_ALTERACAO IS NOT NULL) AND (NEW.USU_ALTERACAO IS NULL)) OR (OLD.USU_ALTERACAO <> NEW.USU_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"USU_ALTERACAO": ' || IIF(OLD.USU_ALTERACAO IS NULL, '"",', '"' || OLD.USU_ALTERACAO || '",');                
+                    IF (((OLD.ID_ASTCONTA_ALTERACAO IS NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NOT NULL)) OR ((OLD.ID_ASTCONTA_ALTERACAO IS NOT NULL) AND (NEW.ID_ASTCONTA_ALTERACAO IS NULL)) OR (OLD.ID_ASTCONTA_ALTERACAO <> NEW.ID_ASTCONTA_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"ID_ASTCONTA_ALTERACAO": ' || IIF(OLD.ID_ASTCONTA_ALTERACAO IS NULL, 'NULL,', OLD.ID_ASTCONTA_ALTERACAO || ',');            
+                    IF (((OLD.DT_ALTERACAO IS NULL) AND (NEW.DT_ALTERACAO IS NOT NULL)) OR ((OLD.DT_ALTERACAO IS NOT NULL) AND (NEW.DT_ALTERACAO IS NULL)) OR (OLD.DT_ALTERACAO <> NEW.DT_ALTERACAO)) THEN DESC_LOG = :DESC_LOG || '"DT_ALTERACAO": ' || IIF(OLD.DT_ALTERACAO IS NULL, '"",', '"' || OLD.DT_ALTERACAO || '",');                
+                    IF (((OLD.ID_INTEGRATION IS NULL) AND (NEW.ID_INTEGRATION IS NOT NULL)) OR ((OLD.ID_INTEGRATION IS NOT NULL) AND (NEW.ID_INTEGRATION IS NULL)) OR (OLD.ID_INTEGRATION <> NEW.ID_INTEGRATION)) THEN DESC_LOG = :DESC_LOG || '"ID_INTEGRATION": ' || IIF(OLD.ID_INTEGRATION IS NULL, 'NULL,', OLD.ID_INTEGRATION || ',');                
+                    IF (((OLD.CODIGO_CLIENTE IS NULL) AND (NEW.CODIGO_CLIENTE IS NOT NULL)) OR ((OLD.CODIGO_CLIENTE IS NOT NULL) AND (NEW.CODIGO_CLIENTE IS NULL)) OR (OLD.CODIGO_CLIENTE <> NEW.CODIGO_CLIENTE)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_CLIENTE": ' || IIF(OLD.CODIGO_CLIENTE IS NULL, 'NULL,', OLD.CODIGO_CLIENTE || ',');                
+                    IF (((OLD.CODIGO_FORNECEDOR IS NULL) AND (NEW.CODIGO_FORNECEDOR IS NOT NULL)) OR ((OLD.CODIGO_FORNECEDOR IS NOT NULL) AND (NEW.CODIGO_FORNECEDOR IS NULL)) OR (OLD.CODIGO_FORNECEDOR <> NEW.CODIGO_FORNECEDOR)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FORNECEDOR": ' || IIF(OLD.CODIGO_FORNECEDOR IS NULL, 'NULL,', OLD.CODIGO_FORNECEDOR || ',');                
+                    IF (((OLD.CODIGO_FUNCIONARIO IS NULL) AND (NEW.CODIGO_FUNCIONARIO IS NOT NULL)) OR ((OLD.CODIGO_FUNCIONARIO IS NOT NULL) AND (NEW.CODIGO_FUNCIONARIO IS NULL)) OR (OLD.CODIGO_FUNCIONARIO <> NEW.CODIGO_FUNCIONARIO)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_FUNCIONARIO": ' || IIF(OLD.CODIGO_FUNCIONARIO IS NULL, 'NULL,', OLD.CODIGO_FUNCIONARIO || ',');                
+                    IF (((OLD.CODIGO_USUARIO IS NULL) AND (NEW.CODIGO_USUARIO IS NOT NULL)) OR ((OLD.CODIGO_USUARIO IS NOT NULL) AND (NEW.CODIGO_USUARIO IS NULL)) OR (OLD.CODIGO_USUARIO <> NEW.CODIGO_USUARIO)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_USUARIO": ' || IIF(OLD.CODIGO_USUARIO IS NULL, 'NULL,', OLD.CODIGO_USUARIO || ',');                
+                    IF (((OLD.CODIGO_TRANSPORTADORA IS NULL) AND (NEW.CODIGO_TRANSPORTADORA IS NOT NULL)) OR ((OLD.CODIGO_TRANSPORTADORA IS NOT NULL) AND (NEW.CODIGO_TRANSPORTADORA IS NULL)) OR (OLD.CODIGO_TRANSPORTADORA <> NEW.CODIGO_TRANSPORTADORA)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_TRANSPORTADORA": ' || IIF(OLD.CODIGO_TRANSPORTADORA IS NULL, 'NULL,', OLD.CODIGO_TRANSPORTADORA || ',');                
+                    IF (((OLD.CODIGO_REPRESENTANTE IS NULL) AND (NEW.CODIGO_REPRESENTANTE IS NOT NULL)) OR ((OLD.CODIGO_REPRESENTANTE IS NOT NULL) AND (NEW.CODIGO_REPRESENTANTE IS NULL)) OR (OLD.CODIGO_REPRESENTANTE <> NEW.CODIGO_REPRESENTANTE)) THEN DESC_LOG = :DESC_LOG || '"CODIGO_REPRESENTANTE": ' || IIF(OLD.CODIGO_REPRESENTANTE IS NULL, 'NULL,', OLD.CODIGO_REPRESENTANTE || ',');            
+                    IF (((OLD.IS_CLIENTE IS NULL) AND (NEW.IS_CLIENTE IS NOT NULL)) OR ((OLD.IS_CLIENTE IS NOT NULL) AND (NEW.IS_CLIENTE IS NULL)) OR (OLD.IS_CLIENTE <> NEW.IS_CLIENTE)) THEN DESC_LOG = :DESC_LOG || '"IS_CLIENTE": ' || IIF(OLD.IS_CLIENTE IS NULL, '"",', '"' || OLD.IS_CLIENTE || '",');            
+                    IF (((OLD.IS_FORNECEDOR IS NULL) AND (NEW.IS_FORNECEDOR IS NOT NULL)) OR ((OLD.IS_FORNECEDOR IS NOT NULL) AND (NEW.IS_FORNECEDOR IS NULL)) OR (OLD.IS_FORNECEDOR <> NEW.IS_FORNECEDOR)) THEN DESC_LOG = :DESC_LOG || '"IS_FORNECEDOR": ' || IIF(OLD.IS_FORNECEDOR IS NULL, '"",', '"' || OLD.IS_FORNECEDOR || '",');            
+                    IF (((OLD.IS_FUNCIONARIO IS NULL) AND (NEW.IS_FUNCIONARIO IS NOT NULL)) OR ((OLD.IS_FUNCIONARIO IS NOT NULL) AND (NEW.IS_FUNCIONARIO IS NULL)) OR (OLD.IS_FUNCIONARIO <> NEW.IS_FUNCIONARIO)) THEN DESC_LOG = :DESC_LOG || '"IS_FUNCIONARIO": ' || IIF(OLD.IS_FUNCIONARIO IS NULL, '"",', '"' || OLD.IS_FUNCIONARIO || '",');            
+                    IF (((OLD.IS_USUARIO IS NULL) AND (NEW.IS_USUARIO IS NOT NULL)) OR ((OLD.IS_USUARIO IS NOT NULL) AND (NEW.IS_USUARIO IS NULL)) OR (OLD.IS_USUARIO <> NEW.IS_USUARIO)) THEN DESC_LOG = :DESC_LOG || '"IS_USUARIO": ' || IIF(OLD.IS_USUARIO IS NULL, '"",', '"' || OLD.IS_USUARIO || '",');            
+                    IF (((OLD.IS_TRANSPORTADORA IS NULL) AND (NEW.IS_TRANSPORTADORA IS NOT NULL)) OR ((OLD.IS_TRANSPORTADORA IS NOT NULL) AND (NEW.IS_TRANSPORTADORA IS NULL)) OR (OLD.IS_TRANSPORTADORA <> NEW.IS_TRANSPORTADORA)) THEN DESC_LOG = :DESC_LOG || '"IS_TRANSPORTADORA": ' || IIF(OLD.IS_TRANSPORTADORA IS NULL, '"",', '"' || OLD.IS_TRANSPORTADORA || '",');            
+                    IF (((OLD.IS_REPRESENTANTE IS NULL) AND (NEW.IS_REPRESENTANTE IS NOT NULL)) OR ((OLD.IS_REPRESENTANTE IS NOT NULL) AND (NEW.IS_REPRESENTANTE IS NULL)) OR (OLD.IS_REPRESENTANTE <> NEW.IS_REPRESENTANTE)) THEN DESC_LOG = :DESC_LOG || '"IS_REPRESENTANTE": ' || IIF(OLD.IS_REPRESENTANTE IS NULL, '"",', '"' || OLD.IS_REPRESENTANTE || '",');            
+                    IF (((OLD.NOME_RAZAO IS NULL) AND (NEW.NOME_RAZAO IS NOT NULL)) OR ((OLD.NOME_RAZAO IS NOT NULL) AND (NEW.NOME_RAZAO IS NULL)) OR (OLD.NOME_RAZAO <> NEW.NOME_RAZAO)) THEN DESC_LOG = :DESC_LOG || '"NOME_RAZAO": ' || IIF(OLD.NOME_RAZAO IS NULL, '"",', '"' || OLD.NOME_RAZAO || '",');            
+                    IF (((OLD.APELIDO_FANTASIA IS NULL) AND (NEW.APELIDO_FANTASIA IS NOT NULL)) OR ((OLD.APELIDO_FANTASIA IS NOT NULL) AND (NEW.APELIDO_FANTASIA IS NULL)) OR (OLD.APELIDO_FANTASIA <> NEW.APELIDO_FANTASIA)) THEN DESC_LOG = :DESC_LOG || '"APELIDO_FANTASIA": ' || IIF(OLD.APELIDO_FANTASIA IS NULL, '"",', '"' || OLD.APELIDO_FANTASIA || '",');            
+                    IF (((OLD.CPF_CNPJ IS NULL) AND (NEW.CPF_CNPJ IS NOT NULL)) OR ((OLD.CPF_CNPJ IS NOT NULL) AND (NEW.CPF_CNPJ IS NULL)) OR (OLD.CPF_CNPJ <> NEW.CPF_CNPJ)) THEN DESC_LOG = :DESC_LOG || '"CPF_CNPJ": ' || IIF(OLD.CPF_CNPJ IS NULL, '"",', '"' || OLD.CPF_CNPJ || '",');            
+                    IF (((OLD.RG_IE IS NULL) AND (NEW.RG_IE IS NOT NULL)) OR ((OLD.RG_IE IS NOT NULL) AND (NEW.RG_IE IS NULL)) OR (OLD.RG_IE <> NEW.RG_IE)) THEN DESC_LOG = :DESC_LOG || '"RG_IE": ' || IIF(OLD.RG_IE IS NULL, '"",', '"' || OLD.RG_IE || '",');            
+                    IF (((OLD.INSC_MUNICIPAL IS NULL) AND (NEW.INSC_MUNICIPAL IS NOT NULL)) OR ((OLD.INSC_MUNICIPAL IS NOT NULL) AND (NEW.INSC_MUNICIPAL IS NULL)) OR (OLD.INSC_MUNICIPAL <> NEW.INSC_MUNICIPAL)) THEN DESC_LOG = :DESC_LOG || '"INSC_MUNICIPAL": ' || IIF(OLD.INSC_MUNICIPAL IS NULL, '"",', '"' || OLD.INSC_MUNICIPAL || '",');            
+                    IF (((OLD.INSC_SUFRAMA IS NULL) AND (NEW.INSC_SUFRAMA IS NOT NULL)) OR ((OLD.INSC_SUFRAMA IS NOT NULL) AND (NEW.INSC_SUFRAMA IS NULL)) OR (OLD.INSC_SUFRAMA <> NEW.INSC_SUFRAMA)) THEN DESC_LOG = :DESC_LOG || '"INSC_SUFRAMA": ' || IIF(OLD.INSC_SUFRAMA IS NULL, '"",', '"' || OLD.INSC_SUFRAMA || '",');            
+                    IF (((OLD.OBS IS NULL) AND (NEW.OBS IS NOT NULL)) OR ((OLD.OBS IS NOT NULL) AND (NEW.OBS IS NULL)) OR (OLD.OBS <> NEW.OBS)) THEN DESC_LOG = :DESC_LOG || '"OBS": ' || IIF(OLD.OBS IS NULL, '"",', '"' || OLD.OBS || '",');            
+                    IF (((OLD.EMAIL_COMPRAS IS NULL) AND (NEW.EMAIL_COMPRAS IS NOT NULL)) OR ((OLD.EMAIL_COMPRAS IS NOT NULL) AND (NEW.EMAIL_COMPRAS IS NULL)) OR (OLD.EMAIL_COMPRAS <> NEW.EMAIL_COMPRAS)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_COMPRAS": ' || IIF(OLD.EMAIL_COMPRAS IS NULL, '"",', '"' || OLD.EMAIL_COMPRAS || '",');            
+                    IF (((OLD.EMAIL_FISCAL IS NULL) AND (NEW.EMAIL_FISCAL IS NOT NULL)) OR ((OLD.EMAIL_FISCAL IS NOT NULL) AND (NEW.EMAIL_FISCAL IS NULL)) OR (OLD.EMAIL_FISCAL <> NEW.EMAIL_FISCAL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FISCAL": ' || IIF(OLD.EMAIL_FISCAL IS NULL, '"",', '"' || OLD.EMAIL_FISCAL || '",');            
+                    IF (((OLD.EMAIL_FINANCEIRO IS NULL) AND (NEW.EMAIL_FINANCEIRO IS NOT NULL)) OR ((OLD.EMAIL_FINANCEIRO IS NOT NULL) AND (NEW.EMAIL_FINANCEIRO IS NULL)) OR (OLD.EMAIL_FINANCEIRO <> NEW.EMAIL_FINANCEIRO)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_FINANCEIRO": ' || IIF(OLD.EMAIL_FINANCEIRO IS NULL, '"",', '"' || OLD.EMAIL_FINANCEIRO || '",');            
+                    IF (((OLD.EMAIL_GERAL IS NULL) AND (NEW.EMAIL_GERAL IS NOT NULL)) OR ((OLD.EMAIL_GERAL IS NOT NULL) AND (NEW.EMAIL_GERAL IS NULL)) OR (OLD.EMAIL_GERAL <> NEW.EMAIL_GERAL)) THEN DESC_LOG = :DESC_LOG || '"EMAIL_GERAL": ' || IIF(OLD.EMAIL_GERAL IS NULL, '"",', '"' || OLD.EMAIL_GERAL || '",');            
+                    IF (((OLD.SITE IS NULL) AND (NEW.SITE IS NOT NULL)) OR ((OLD.SITE IS NOT NULL) AND (NEW.SITE IS NULL)) OR (OLD.SITE <> NEW.SITE)) THEN DESC_LOG = :DESC_LOG || '"SITE": ' || IIF(OLD.SITE IS NULL, '"",', '"' || OLD.SITE || '",');        
+            DESC_LOG = :DESC_LOG || '}'; -- FINALIZA O JSON
         
-        EXECUTE PROCEDURE PROC_LOG_INSERT(:ID_ASTACCOU_LOGIN,  OLD.ID_ASTEMPRE , 'U', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG, NULL) RETURNING_VALUES :ID_ASTLOGTA;
-        IF ( :ID_ASTLOGTA <= 0 ) THEN
             INSERT INTO ASTLOGER (ID_ASTCONTA_CADASTRO, ID_ASTEMPRE, TIPO_OPERACAO, ARQUIVO, ID_REGISTRO, DT_OPERACAO, DESCRICAO_LOG)
-                          VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG);
+                VALUES ( IIF(:ID_ASTACCOU_LOGIN <= 0, NULL, :ID_ASTACCOU_LOGIN),  OLD.ID_ASTEMPRE , 'U', 'CFTPESSO', OLD.ID_CFTPESSO, 'NOW', :DESC_LOG);
 
-    END
+        END
 END;^
 
 SET TERM ; ^;
@@ -4285,18 +3964,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTEMPRE" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "CFTPESSO"  */
-    IF (NEW.ID_ASTEMPRE IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTEMPRE
-            WHERE ASTEMPRE.ID_ASTEMPRE = NEW.ID_ASTEMPRE
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTEMPRE || ' na tabela ASTEMPRE .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -4340,6 +4007,8 @@ BEGIN
 END;^
 
 SET TERM ; ^;
+
+COMMENT ON TRIGGER TBI_CFTPESSO_P10 IS 'É uma trigger particular para essa tabela, pois se o registro a ser inserido for de cadastro de cliente, fornecedor, ou funcionário, então a trigger vai preencher o campo de código de cada tipo de cadastro.';
 
 
 SET TERM ^ ;
