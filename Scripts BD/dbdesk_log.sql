@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      InterBase 6.x And Firebird 3.0               */
-/* Created on:     22/11/2020 09:09:37                          */
+/* Created on:     28/11/2020 04:15:35                          */
 /*==============================================================*/
 
 
@@ -79,6 +79,8 @@ DROP DOMAIN DMGEOMETRY;
 DROP DOMAIN DMID;
 
 DROP DOMAIN DMIDBIG;
+
+DROP DOMAIN DMIMAGE;
 
 DROP DOMAIN DMINTEGRATION;
 
@@ -205,6 +207,11 @@ CREATE DOMAIN DMID AS INTEGER;
 CREATE DOMAIN DMIDBIG AS BIGINT;
 
 /*==============================================================*/
+/* Domain: DMIMAGE                                              */
+/*==============================================================*/
+CREATE DOMAIN DMIMAGE AS BLOB;
+
+/*==============================================================*/
 /* Domain: DMINTEGRATION                                        */
 /*==============================================================*/
 CREATE DOMAIN DMINTEGRATION AS INTEGER;
@@ -213,6 +220,8 @@ CREATE DOMAIN DMINTEGRATION AS INTEGER;
 /* Domain: DMIS                                                 */
 /*==============================================================*/
 CREATE DOMAIN DMIS AS CHAR(1);
+
+COMMENT ON DOMAIN DMIS IS 'Sim(1) ou Não(0)';
 
 /*==============================================================*/
 /* Domain: DMLEVEL                                              */
@@ -274,11 +283,31 @@ CREATE DOMAIN DMVALUE AS DOUBLE PRECISION DEFAULT 0 NOT NULL;
 /*==============================================================*/
 CREATE DOMAIN DMWEIGHT AS DOUBLE PRECISION DEFAULT 0 NOT NULL;
 
+CREATE OR ALTER EXCEPTION ERRDEL_CHILD_PARENT 'O registro foi usando em outra tabela, com isso não pode ser deletado. Deleção proibida!';
+
+COMMENT ON EXCEPTION ERRDEL_CHILD_PARENT IS 'Comentários';
+
+CREATE OR ALTER EXCEPTION ERRINS_PARENT_NOT_EXIST 'Essa registro depende da existencia de outro registro em outra tabela, e neste momento não existe';
+
+CREATE OR ALTER EXCEPTION ERRORS_GROUP_DISABLE 'O grupo da conta está inativo. Por isso não pode prosseguir. Se deseja realmente prosseguir ative o grupo da conta ou troque o grupo da conta para um grupo que esteja ativo.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_DISABLE 'O usuário e/ou a conta está inativa. Por isso não pode prosseguir.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_EXIST 'O usuário e nem o identificador da conta não está cadastrado, ou seja, a conta de login não existe.';
+
+CREATE OR ALTER EXCEPTION ERRORS_USER_LOGIN_NOT_PARAM 'Não foi passado o nome do usuário e nem o identificador da conta no momento de fazer a transação(inserir, atualizar ou deletar)';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CHILD 'Nessa tabela não pode alterar o registro filho, ou seja, não pode alter o ID de um campo que depende de outra tabela(filho).';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CANNOT_MODIFY_CLOMUN 'Por padrão definido o campo não pode ser modificado.';
+
+CREATE OR ALTER EXCEPTION ERRUPD_CHILD_PARENT 'O registro foi usando em outra tabela, então um ou mias campo não poder ser alterado. Altaração proibida!';
+
 /*==============================================================*/
 /* Table: ASTCATLO                                              */
 /*==============================================================*/
 CREATE TABLE ASTCATLO (
-ID_ASTCATLO          DMIDBIG                        NOT NULL,
+ID_ASTCATLO          DMID                           NOT NULL,
 UUID                 DMUUID                         NOT NULL,
 USU_CADASTRO         DMUSER,
 ID_ASTCONTA_CADASTRO DMID,
@@ -316,7 +345,7 @@ NOME_CATEGORIA
 /*==============================================================*/
 CREATE TABLE ASTLOGAP (
 ID_ASTLOGAP          DMIDBIG                        NOT NULL,
-ID_ASTCATLO          DMIDBIG,
+ID_ASTCATLO          DMID,
 UUID                 DMUUID                         NOT NULL,
 USU_CADASTRO         DMUSER,
 ID_ASTCONTA_CADASTRO DMID,
@@ -402,7 +431,7 @@ SERVERNAME
 /*==============================================================*/
 CREATE TABLE ASTLOGTA (
 ID_ASTLOGTA          DMIDBIG                        NOT NULL,
-ID_ASTCATLO          DMIDBIG,
+ID_ASTCATLO          DMID,
 ID_ASTEMPRE          DMID,
 UUID                 DMUUID                         NOT NULL,
 USU_CADASTRO         DMUSER,
@@ -585,18 +614,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTCATLO" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTLOGAP"  */
-    IF (NEW.ID_ASTCATLO IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTCATLO
-            WHERE ASTCATLO.ID_ASTCATLO = NEW.ID_ASTCATLO
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTCATLO || ' na tabela ASTCATLO .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -648,18 +665,6 @@ BEGIN
     NEW.DT_ALTERACAO = 'NOW';
     NEW.USU_ALTERACAO = USER;    
 
-    /*  PARENT "ASTCATLO" MUST EXIST WHEN UPDATING A CHILD IN "ASTLOGAP"  */
-    IF (NEW.ID_ASTCATLO IS NOT NULL) THEN
-    BEGIN
-       SELECT COUNT(*)
-       FROM   ASTCATLO
-       WHERE  ASTCATLO.ID_ASTCATLO = NEW.ID_ASTCATLO
-       INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST ('Não existe o registro ' || NEW.ID_ASTCATLO || 'na tabela ASTCATLO.');
-       END
-    END
 END;^
 
 SET TERM ; ^;
@@ -675,18 +680,6 @@ DECLARE VARIABLE NUMROWS INTEGER;
 DECLARE VARIABLE ID_ASTACCOU_LOGIN BIGINT;
 BEGIN
     IF ( (RDB$GET_CONTEXT('USER_SESSION', 'IN_REPLICATION') = '1') OR (RDB$GET_CONTEXT('USER_SESSION', 'IN_UPDATE') = '1') )THEN EXIT;
-    /*  NA TEBELA "ASTCATLO" DEVE EXISTIR O REGISTRO AO INSERIR UM UM REGISTRO DA NTABELA "ASTLOGTA"  */
-    IF (NEW.ID_ASTCATLO IS NOT NULL) THEN
-    BEGIN
-        SELECT COUNT(*)
-            FROM ASTCATLO
-            WHERE ASTCATLO.ID_ASTCATLO = NEW.ID_ASTCATLO
-            INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST (' Não existe o registro ' || NEW.ID_ASTCATLO || ' na tabela ASTCATLO .');
-       END
-    END
 
     IF (NEW.ID_ASTCONTA_CADASTRO IS NULL) THEN
     BEGIN
@@ -738,18 +731,6 @@ BEGIN
     NEW.DT_ALTERACAO = 'NOW';
     NEW.USU_ALTERACAO = USER;    
 
-    /*  PARENT "ASTCATLO" MUST EXIST WHEN UPDATING A CHILD IN "ASTLOGTA"  */
-    IF (NEW.ID_ASTCATLO IS NOT NULL) THEN
-    BEGIN
-       SELECT COUNT(*)
-       FROM   ASTCATLO
-       WHERE  ASTCATLO.ID_ASTCATLO = NEW.ID_ASTCATLO
-       INTO   :NUMROWS;
-       IF (NUMROWS = 0) THEN
-       BEGIN
-          EXCEPTION ERRINS_PARENT_NOT_EXIST ('Não existe o registro ' || NEW.ID_ASTCATLO || 'na tabela ASTCATLO.');
-       END
-    END
 END;^
 
 SET TERM ; ^;
